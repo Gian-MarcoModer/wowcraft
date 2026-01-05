@@ -176,12 +176,12 @@ public class SpawnedMobPack {
      * Mobs stay stationary when idle, but can chase when aggroed.
      */
     private void makePackMobTerritorial(Mob mob, BlockPos homePos) {
-        // Set home position with 16 block leash - they can chase but will return
-        mob.restrictTo(homePos, 16);
+        // Set home position with 32 block leash - they can chase but will return
+        mob.restrictTo(homePos, 32);
 
         // Stationary behavior is added via PackMobGoalMixin
 
-        WowCraft.LOGGER.debug("Made mob territorial at {} with 16 block leash and stationary AI", homePos);
+        WowCraft.LOGGER.debug("Made mob territorial at {} with 32 block leash and stationary AI", homePos);
     }
 
     /**

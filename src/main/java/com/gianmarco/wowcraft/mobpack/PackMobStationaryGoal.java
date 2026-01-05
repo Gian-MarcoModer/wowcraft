@@ -7,7 +7,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * AI Goal that prevents pack mobs from wandering when not aggroed.
- * This goal has highest priority and cancels all movement when mob has no target.
+ * This goal has high priority and cancels all movement when mob has no target.
  */
 public class PackMobStationaryGoal extends Goal {
     private final Mob mob;
