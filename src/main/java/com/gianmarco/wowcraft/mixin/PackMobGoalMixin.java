@@ -1,6 +1,7 @@
 package com.gianmarco.wowcraft.mixin;
 
 import com.gianmarco.wowcraft.entity.MobData;
+import com.gianmarco.wowcraft.mobpack.DynamicAggroRangeGoal;
 import com.gianmarco.wowcraft.mobpack.PackMobStationaryGoal;
 import com.gianmarco.wowcraft.playerclass.PlayerDataRegistry;
 import net.minecraft.core.BlockPos;
@@ -25,12 +26,17 @@ public abstract class PackMobGoalMixin {
     @Shadow
     protected net.minecraft.world.entity.ai.goal.GoalSelector goalSelector;
 
+    @Shadow
+    protected net.minecraft.world.entity.ai.goal.GoalSelector targetSelector;
+
     @Unique
-    private static final double LEASH_RANGE = 32.0;
+    private static final double LEASH_RANGE = 24.0;
     @Unique
-    private static final int NO_DAMAGE_TICKS = 100; // 5 seconds
+    private static final int LEASH_RESET_TICKS = 100; // 5 seconds out of leash range
     @Unique
-    private static final int HEALTH_REGEN_TICKS = 20; // 1 second
+    private static final int HEALTH_REGEN_TICKS = 100; // 5 seconds to regen health
+    @Unique
+    private int wowcraft$ticksOutOfLeashRange = 0; // Track time spent beyond leash
     @Unique
     private int wowcraft$regenTicksRemaining = 0;
     @Unique
@@ -51,6 +57,9 @@ public abstract class PackMobGoalMixin {
         // Check if this is a pack mob
         MobData data = self.getAttached(PlayerDataRegistry.MOB_DATA);
         if (data != null && data.packId() != null) {
+            // Add dynamic aggro range goal with priority (1) - targets players based on level
+            targetSelector.addGoal(1, new DynamicAggroRangeGoal(self));
+
             // Add stationary goal with priority (0) - runs when not aggroed
             goalSelector.addGoal(0, new PackMobStationaryGoal(self));
         }
@@ -69,41 +78,59 @@ public abstract class PackMobGoalMixin {
             return;
         }
 
-        // Track when mob takes damage
-        int currentTicksSinceLastHurt = self.tickCount - self.getLastHurtByMobTimestamp();
-
         // Check if mob is too far from home position
         BlockPos home = self.getRestrictCenter();
         if (home != null) {
             double distanceFromHome = self.position().distanceTo(home.getCenter());
+            boolean isBeyondLeash = distanceFromHome > LEASH_RANGE;
+            boolean hasTarget = self.getTarget() != null;
 
-            // If mob has a target, is beyond leash range, AND hasn't taken damage for 5 seconds
-            if (self.getTarget() != null && distanceFromHome > LEASH_RANGE
-                    && currentTicksSinceLastHurt >= NO_DAMAGE_TICKS) {
-                self.setTarget(null);
-                self.setLastHurtByMob(null);
-                wowcraft$wasAggroed = true;
+            // Track if mob took damage this tick
+            int ticksSinceLastHurt = self.tickCount - self.getLastHurtByMobTimestamp();
+            boolean tookDamageRecently = ticksSinceLastHurt < 2; // Within last 2 ticks
 
-                // Start health regeneration
-                float healthToRegen = self.getMaxHealth() - self.getHealth();
-                wowcraft$healthPerTick = healthToRegen / HEALTH_REGEN_TICKS;
-                wowcraft$regenTicksRemaining = HEALTH_REGEN_TICKS;
+            if (hasTarget && isBeyondLeash) {
+                // Beyond leash range with a target
 
-                // Increase movement speed temporarily
-                var speedAttr = self.getAttribute(Attributes.MOVEMENT_SPEED);
-                if (speedAttr != null && speedAttr.hasModifier(wowcraft$getSpeedModifier().id())) {
-                    speedAttr.removeModifier(wowcraft$getSpeedModifier().id());
-                    speedAttr.addPermanentModifier(wowcraft$getSpeedModifier());
+                if (tookDamageRecently) {
+                    // Damage resets the timer back to 5 seconds
+                    wowcraft$ticksOutOfLeashRange = 0;
+                } else {
+                    // Increment timer
+                    wowcraft$ticksOutOfLeashRange++;
                 }
+
+                // Check if timer expired (5 seconds out of leash range)
+                if (wowcraft$ticksOutOfLeashRange >= LEASH_RESET_TICKS) {
+                    // Reset aggro
+                    self.setTarget(null);
+                    self.setLastHurtByMob(null);
+                    wowcraft$wasAggroed = true;
+                    wowcraft$ticksOutOfLeashRange = 0;
+
+                    // Start health regeneration
+                    float healthToRegen = self.getMaxHealth() - self.getHealth();
+                    wowcraft$healthPerTick = healthToRegen / HEALTH_REGEN_TICKS;
+                    wowcraft$regenTicksRemaining = HEALTH_REGEN_TICKS;
+
+                    // Increase movement speed temporarily
+                    var speedAttr = self.getAttribute(Attributes.MOVEMENT_SPEED);
+                    if (speedAttr != null && !speedAttr.hasModifier(wowcraft$getSpeedModifier().id())) {
+                        speedAttr.addPermanentModifier(wowcraft$getSpeedModifier());
+                    }
+                }
+            } else {
+                // Not beyond leash or no target - reset timer
+                wowcraft$ticksOutOfLeashRange = 0;
             }
 
             // If mob just lost aggro, boost speed
-            if (wowcraft$wasAggroed && self.getTarget() == null && distanceFromHome > 2.0) {
+            if (wowcraft$wasAggroed && !hasTarget && distanceFromHome > 2.0) {
                 var speedAttr = self.getAttribute(Attributes.MOVEMENT_SPEED);
                 if (speedAttr != null && !speedAttr.hasModifier(wowcraft$getSpeedModifier().id())) {
                     speedAttr.addPermanentModifier(wowcraft$getSpeedModifier());
                 }
-            } else if (self.getTarget() != null) {
+            } else if (hasTarget) {
                 // Reset flag when mob gets aggroed again
                 wowcraft$wasAggroed = false;
                 // Remove speed boost when mob gets aggroed

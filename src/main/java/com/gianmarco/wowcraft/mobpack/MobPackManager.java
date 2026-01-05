@@ -3,6 +3,10 @@ package com.gianmarco.wowcraft.mobpack;
 import com.gianmarco.wowcraft.WowCraft;
 import com.gianmarco.wowcraft.entity.MobData;
 import com.gianmarco.wowcraft.playerclass.PlayerDataRegistry;
+import com.gianmarco.wowcraft.poi.POIGenerator;
+import com.gianmarco.wowcraft.poi.POIManager;
+import com.gianmarco.wowcraft.poi.POISaveData;
+import com.gianmarco.wowcraft.poi.PointOfInterest;
 import com.gianmarco.wowcraft.zone.BiomeGroup;
 import com.gianmarco.wowcraft.zone.ZoneRegion;
 import com.gianmarco.wowcraft.zone.ZoneSaveData;
@@ -86,11 +90,16 @@ public class MobPackManager {
             return;
         }
 
-        // Process up to 5 chunks per tick to avoid lag
+        // Only spawn packs if players are in the world (defer during initial world gen)
+        if (level.players().isEmpty()) {
+            return;
+        }
+
+        // Process up to 2 chunks per tick to avoid lag (reduced from 5)
         int processedThisTick = 0;
         Iterator<Long> iterator = pendingChunks.iterator();
 
-        while (iterator.hasNext() && processedThisTick < 5) {
+        while (iterator.hasNext() && processedThisTick < 2) {
             long chunkKey = iterator.next();
             iterator.remove();
 
@@ -106,6 +115,7 @@ public class MobPackManager {
 
     /**
      * Actually processes a chunk for pack spawning.
+     * Now uses POI system for structured spawning.
      */
     private static void processChunkForPackSpawn(ServerLevel level, ChunkPos chunkPos) {
         // Check if already processed
@@ -123,64 +133,149 @@ public class MobPackManager {
         }
 
         // Check if zone is discovered
-        ZoneSaveData saveData = ZoneSaveData.get(level);
-        ZoneRegion zone = saveData.getZone(group);
+        ZoneSaveData zoneSaveData = ZoneSaveData.get(level);
+        ZoneRegion zone = zoneSaveData.getZone(group);
 
-        // If zone is null, we proceed with fallback leveling (distance-based)
-        // This ensures mobs spawn even if the player hasn't "discovered" the zone yet
+        // Get POI system
+        POISaveData poiSaveData = POISaveData.get(level);
+        POIManager poiManager = poiSaveData.getManager();
+
+        // Check if POIs have been generated for this region
+        if (!poiManager.isRegionGenerated(chunkCenter)) {
+            // Generate POIs for this region
+            POIManager.RegionPos regionPos = POIManager.RegionPos.fromBlockPos(chunkCenter, 300);
+            BlockPos regionCenter = regionPos.getCenterBlockPos(300);
+
+            WowCraft.LOGGER.debug("Generating POIs for region at {} (biome: {})", regionCenter, group);
+
+            List<PointOfInterest> newPOIs = POIGenerator.generatePOIsForRegion(
+                    level, regionCenter, level.getSeed(), group);
+
+            // Add POIs to manager
+            for (PointOfInterest poi : newPOIs) {
+                poiManager.addPOI(poi);
+            }
+
+            // Mark region as generated
+            poiManager.markRegionGenerated(regionCenter);
+
+            // Save POI data (async to avoid blocking)
+            poiSaveData.save();
+
+            WowCraft.LOGGER.debug("Generated and saved {} POIs for region {}", newPOIs.size(), regionPos);
+        }
+
+        // Get POIs near this chunk
+        List<PointOfInterest> nearbyPOIs = poiManager.getPOIsNearChunk(chunkPos);
 
         // Mark as processed
         processedChunks.add(chunkKey);
 
-        // Roll for pack spawn with clustering bonus
+        // Spawn packs at POI locations (limit to 1 pack per chunk processing to avoid lag)
         Random random = new Random(chunkKey ^ level.getSeed());
+        int spawnsThisChunk = 0;
+        final int MAX_SPAWNS_PER_CHUNK = 1;
 
-        // Check if there's a pack nearby to create clustering effect
-        boolean hasNearbyPack = hasPackWithinDistance(chunkPos, CLUSTER_DISTANCE);
+        for (PointOfInterest poi : nearbyPOIs) {
+            if (spawnsThisChunk >= MAX_SPAWNS_PER_CHUNK) {
+                break; // Limit spawns per chunk processing
+            }
 
-        int spawnChance = PACK_SPAWN_CHANCE;
-        if (hasNearbyPack) {
-            // Reduce the divisor (increase spawn chance) if near existing pack
-            spawnChance = (int) (PACK_SPAWN_CHANCE * (1.0f - CLUSTER_BONUS_CHANCE));
-        }
+            // Check if this POI already has packs spawned
+            if (!poi.getAssignedPackIds().isEmpty()) {
+                continue; // Already has packs
+            }
 
-        if (random.nextInt(Math.max(1, spawnChance)) != 0) {
-            return; // No pack this chunk
-        }
+            // Get spawn positions from POI
+            List<BlockPos> spawnPositions = poi.getSpawnPositions();
 
-        // Get a template for this zone
-        MobPackTemplate template = MobPackTemplateLoader.getRandomTemplateForZone(group, random);
-        if (template == null) {
-            WowCraft.LOGGER.debug("No pack templates for zone {}", group);
-            return;
-        }
+            for (BlockPos spawnPos : spawnPositions) {
+                if (spawnsThisChunk >= MAX_SPAWNS_PER_CHUNK) {
+                    break; // Limit spawns
+                }
 
-        // Find a valid spawn position on the surface
-        BlockPos packCenter = findPackSpawnPosition(level, chunkPos, random);
-        if (packCenter == null) {
-            WowCraft.LOGGER.debug("Could not find valid pack position in chunk {}", chunkPos);
-            return;
-        }
+                // Get a template for this zone
+                MobPackTemplate template = MobPackTemplateLoader.getRandomTemplateForZone(group, random);
+                if (template == null) {
+                    WowCraft.LOGGER.debug("No pack templates for zone {}", group);
+                    continue;
+                }
 
-        // Check minimum distance from other packs
-        if (!isValidPackLocation(packCenter)) {
-            return;
-        }
+                // Adjust Y coordinate to surface
+                BlockPos surfacePos = findSurfaceNear(level, spawnPos);
+                if (surfacePos == null) {
+                    WowCraft.LOGGER.debug("Could not find surface near POI spawn position {}", spawnPos);
+                    continue;
+                }
 
-        // Generate the pack
-        SpawnedMobPack pack = generatePack(level, template, packCenter, zone, random);
-        if (pack != null) {
-            registerPack(pack);
-            pack.spawnReadyMobs(level, level.getGameTime());
+                // Generate the pack
+                SpawnedMobPack pack = generatePack(level, template, surfacePos, zone, random);
+                if (pack != null) {
+                    registerPack(pack);
+                    pack.spawnReadyMobs(level, level.getGameTime());
 
-            String zoneName = zone != null ? zone.assignedName() : "Unknown (" + group.name() + ")";
-            WowCraft.LOGGER.info("Spawned {} pack at {} (zone: {}, level: {})",
-                    template.id(), packCenter, zoneName, pack.getTargetLevel());
+                    // Link pack to POI
+                    poi.assignPack(pack.getPackId());
+
+                    String zoneName = zone != null ? zone.assignedName() : "Unknown (" + group.name() + ")";
+                    WowCraft.LOGGER.info("Spawned {} pack at {} from {} POI (zone: {}, level: {})",
+                            template.id(), surfacePos, poi.getType(), zoneName, pack.getTargetLevel());
+
+                    spawnsThisChunk++;
+                }
+            }
         }
     }
 
     /**
-     * Find a valid surface position in the chunk for a pack.
+     * Find surface position near a target position (for POI spawning).
+     */
+    @Nullable
+    private static BlockPos findSurfaceNear(ServerLevel level, BlockPos target) {
+        // Try the exact position first
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, target.getX(), target.getZ());
+
+        // Validate Y is within world bounds
+        if (y >= level.getMinY() && y <= level.getMaxY() - 2) {
+            BlockPos pos = new BlockPos(target.getX(), y, target.getZ());
+
+            // Quick check: is there a solid block below and air above?
+            BlockState below = level.getBlockState(pos.below());
+            BlockState at = level.getBlockState(pos);
+
+            if ((below.isSuffocating(level, pos.below()) || below.blocksMotion()) &&
+                !at.isSuffocating(level, pos)) {
+                return pos;
+            }
+        }
+
+        // If exact position fails, try nearby positions
+        Random random = new Random(target.asLong());
+        for (int attempt = 0; attempt < 5; attempt++) {
+            int offsetX = random.nextInt(10) - 5;
+            int offsetZ = random.nextInt(10) - 5;
+
+            int x = target.getX() + offsetX;
+            int z = target.getZ() + offsetZ;
+            y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+
+            if (y >= level.getMinY() && y <= level.getMaxY() - 2) {
+                BlockPos pos = new BlockPos(x, y, z);
+                BlockState below = level.getBlockState(pos.below());
+                BlockState at = level.getBlockState(pos);
+
+                if ((below.isSuffocating(level, pos.below()) || below.blocksMotion()) &&
+                    !at.isSuffocating(level, pos)) {
+                    return pos;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find a valid surface position in the chunk for a pack (legacy, for fallback).
      */
     @Nullable
     private static BlockPos findPackSpawnPosition(ServerLevel level, ChunkPos chunkPos, Random random) {

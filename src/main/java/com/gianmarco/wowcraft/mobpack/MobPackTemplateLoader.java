@@ -36,13 +36,32 @@ public class MobPackTemplateLoader {
     }
 
     /**
-     * Register the 3 basic pack templates for testing.
+     * Register mob pack templates for all biome types.
      */
     private static void registerDefaultTemplates() {
-        // Zombie Pack - spawns in forests and plains
+        // === PLAINS PACKS ===
+        TEMPLATES.put("bandit_camp", new MobPackTemplate(
+                "bandit_camp",
+                Set.of(BiomeGroup.PLAINS),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:pillager"), 1, 2, 60),
+                        new MobEntry(ResourceLocation.parse("minecraft:vindicator"), 0, 1, 40)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("plains_wolf_pack", new MobPackTemplate(
+                "plains_wolf_pack",
+                Set.of(BiomeGroup.PLAINS),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:wolf"), 2, 4, 100)),
+                3, 5,
+                10.0f, // Wolves have larger pack coordination
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
         TEMPLATES.put("zombie_pack", new MobPackTemplate(
                 "zombie_pack",
-                Set.of(BiomeGroup.FOREST, BiomeGroup.PLAINS),
+                Set.of(BiomeGroup.PLAINS, BiomeGroup.FOREST),
                 List.of(
                         new MobEntry(ResourceLocation.parse("minecraft:zombie"), 1, 3, 70),
                         new MobEntry(ResourceLocation.parse("minecraft:husk"), 0, 1, 30)),
@@ -50,10 +69,29 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
-        // Skeleton Pack - spawns in forests and snowy areas
+        // === SNOWY PLAINS PACKS ===
+        TEMPLATES.put("frost_skeleton_pack", new MobPackTemplate(
+                "frost_skeleton_pack",
+                Set.of(BiomeGroup.SNOWY_PLAINS, BiomeGroup.MOUNTAIN),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:stray"), 2, 3, 100)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("polar_bear_pack", new MobPackTemplate(
+                "polar_bear_pack",
+                Set.of(BiomeGroup.SNOWY_PLAINS),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:polar_bear"), 1, 2, 100)),
+                1, 3,
+                8.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === FOREST PACKS ===
         TEMPLATES.put("skeleton_pack", new MobPackTemplate(
                 "skeleton_pack",
-                Set.of(BiomeGroup.FOREST, BiomeGroup.TAIGA, BiomeGroup.SNOWY_PLAINS),
+                Set.of(BiomeGroup.FOREST, BiomeGroup.TAIGA, BiomeGroup.DARK_FOREST),
                 List.of(
                         new MobEntry(ResourceLocation.parse("minecraft:skeleton"), 2, 3, 80),
                         new MobEntry(ResourceLocation.parse("minecraft:stray"), 0, 1, 20)),
@@ -61,16 +99,232 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
-        // Spider Nest - spawns in forests and swamps
         TEMPLATES.put("spider_nest", new MobPackTemplate(
                 "spider_nest",
-                Set.of(BiomeGroup.FOREST, BiomeGroup.SWAMP),
+                Set.of(BiomeGroup.FOREST, BiomeGroup.SWAMP, BiomeGroup.DARK_FOREST),
                 List.of(
                         new MobEntry(ResourceLocation.parse("minecraft:spider"), 2, 4, 70),
                         new MobEntry(ResourceLocation.parse("minecraft:cave_spider"), 0, 2, 30)),
                 3, 5,
-                6.0f, // Smaller social aggro radius for spiders
+                6.0f,
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("forest_creeper_pack", new MobPackTemplate(
+                "forest_creeper_pack",
+                Set.of(BiomeGroup.FOREST, BiomeGroup.CHERRY_GROVE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:creeper"), 1, 3, 100)),
+                2, 3,
+                5.0f, // Creepers don't coordinate as much
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === DARK FOREST PACKS ===
+        TEMPLATES.put("dark_zombie_horde", new MobPackTemplate(
+                "dark_zombie_horde",
+                Set.of(BiomeGroup.DARK_FOREST),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:zombie"), 2, 4, 60),
+                        new MobEntry(ResourceLocation.parse("minecraft:zombie_villager"), 0, 1, 40)),
+                3, 5,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("witch_coven", new MobPackTemplate(
+                "witch_coven",
+                Set.of(BiomeGroup.DARK_FOREST, BiomeGroup.SWAMP),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:witch"), 1, 2, 100)),
+                1, 3,
+                12.0f, // Witches support each other at range
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === TAIGA PACKS ===
+        TEMPLATES.put("taiga_wolf_pack", new MobPackTemplate(
+                "taiga_wolf_pack",
+                Set.of(BiomeGroup.TAIGA),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:wolf"), 3, 5, 100)),
+                3, 6,
+                12.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("frozen_undead", new MobPackTemplate(
+                "frozen_undead",
+                Set.of(BiomeGroup.TAIGA),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:stray"), 1, 2, 60),
+                        new MobEntry(ResourceLocation.parse("minecraft:skeleton"), 0, 2, 40)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === JUNGLE PACKS ===
+        TEMPLATES.put("jungle_spider_nest", new MobPackTemplate(
+                "jungle_spider_nest",
+                Set.of(BiomeGroup.JUNGLE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:spider"), 2, 3, 70),
+                        new MobEntry(ResourceLocation.parse("minecraft:cave_spider"), 1, 2, 30)),
+                3, 5,
+                6.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("jungle_zombie_pack", new MobPackTemplate(
+                "jungle_zombie_pack",
+                Set.of(BiomeGroup.JUNGLE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:zombie"), 2, 4, 100)),
+                2, 5,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === DESERT PACKS ===
+        TEMPLATES.put("desert_husk_pack", new MobPackTemplate(
+                "desert_husk_pack",
+                Set.of(BiomeGroup.DESERT),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:husk"), 2, 4, 100)),
+                3, 5,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("desert_bandit_camp", new MobPackTemplate(
+                "desert_bandit_camp",
+                Set.of(BiomeGroup.DESERT),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:pillager"), 1, 2, 70),
+                        new MobEntry(ResourceLocation.parse("minecraft:vindicator"), 0, 1, 30)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === SAVANNA PACKS ===
+        TEMPLATES.put("savanna_creeper_pack", new MobPackTemplate(
+                "savanna_creeper_pack",
+                Set.of(BiomeGroup.SAVANNA),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:creeper"), 1, 3, 100)),
+                2, 4,
+                5.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("savanna_skeleton_pack", new MobPackTemplate(
+                "savanna_skeleton_pack",
+                Set.of(BiomeGroup.SAVANNA),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:skeleton"), 2, 3, 100)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === BADLANDS PACKS ===
+        TEMPLATES.put("badlands_husk_pack", new MobPackTemplate(
+                "badlands_husk_pack",
+                Set.of(BiomeGroup.BADLANDS),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:husk"), 2, 4, 80),
+                        new MobEntry(ResourceLocation.parse("minecraft:zombie"), 0, 1, 20)),
+                3, 5,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("canyon_spider_pack", new MobPackTemplate(
+                "canyon_spider_pack",
+                Set.of(BiomeGroup.BADLANDS),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:spider"), 2, 3, 100)),
+                2, 4,
+                6.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === SWAMP PACKS ===
+        TEMPLATES.put("swamp_zombie_pack", new MobPackTemplate(
+                "swamp_zombie_pack",
+                Set.of(BiomeGroup.SWAMP),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:drowned"), 1, 2, 60),
+                        new MobEntry(ResourceLocation.parse("minecraft:zombie"), 1, 2, 40)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("slime_pool", new MobPackTemplate(
+                "slime_pool",
+                Set.of(BiomeGroup.SWAMP),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:slime"), 2, 4, 100)),
+                3, 6,
+                8.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === MOUNTAIN & WINDSWEPT PACKS ===
+        TEMPLATES.put("mountain_goat_herd", new MobPackTemplate(
+                "mountain_goat_herd",
+                Set.of(BiomeGroup.MOUNTAIN, BiomeGroup.WINDSWEPT),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:goat"), 2, 4, 100)),
+                2, 5,
+                10.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("windswept_skeleton_pack", new MobPackTemplate(
+                "windswept_skeleton_pack",
+                Set.of(BiomeGroup.WINDSWEPT),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:skeleton"), 2, 3, 70),
+                        new MobEntry(ResourceLocation.parse("minecraft:creeper"), 0, 1, 30)),
+                2, 4,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === CHERRY GROVE PACKS ===
+        TEMPLATES.put("cherry_grove_bee_swarm", new MobPackTemplate(
+                "cherry_grove_bee_swarm",
+                Set.of(BiomeGroup.CHERRY_GROVE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:bee"), 3, 6, 100)),
+                4, 8,
+                15.0f, // Bees swarm aggressively
+                60)); // Faster respawn for bees
+
+        // === MUSHROOM ISLAND PACKS ===
+        // Mushroom islands are peaceful - only mooshrooms
+        TEMPLATES.put("mooshroom_herd", new MobPackTemplate(
+                "mooshroom_herd",
+                Set.of(BiomeGroup.MUSHROOM),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:mooshroom"), 2, 4, 100)),
+                2, 5,
+                0.0f, // Passive mobs don't aggro
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        // === CAVE PACKS ===
+        TEMPLATES.put("cave_zombie_pack", new MobPackTemplate(
+                "cave_zombie_pack",
+                Set.of(BiomeGroup.CAVE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:zombie"), 2, 4, 100)),
+                2, 5,
+                MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("cave_spider_nest", new MobPackTemplate(
+                "cave_spider_nest",
+                Set.of(BiomeGroup.CAVE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:cave_spider"), 3, 5, 100)),
+                4, 7,
+                6.0f,
+                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+
+        TEMPLATES.put("deep_dark_warden", new MobPackTemplate(
+                "deep_dark_warden",
+                Set.of(BiomeGroup.CAVE),
+                List.of(
+                        new MobEntry(ResourceLocation.parse("minecraft:warden"), 1, 1, 100)),
+                1, 1,
+                20.0f, // Warden has massive aggro range
+                600)); // 10 minute respawn for warden
     }
 
     /**
