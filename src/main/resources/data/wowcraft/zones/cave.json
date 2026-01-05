@@ -1,0 +1,35 @@
+{
+    "biome_group": "CAVE",
+    "zones": [
+        {
+            "name": "Gloomstone Depths",
+            "subtitle": "Where Sunlight Dies",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Crystalline Hollow",
+            "subtitle": "The Dripping Darkness",
+            "level_min": 18,
+            "level_max": 25
+        },
+        {
+            "name": "Verdant Abyss",
+            "subtitle": "Life Finds a Way",
+            "level_min": 32,
+            "level_max": 40
+        },
+        {
+            "name": "Echoing Chasm",
+            "subtitle": "Whispers in Stone",
+            "level_min": 48,
+            "level_max": 54
+        },
+        {
+            "name": "The Sunken Dark",
+            "subtitle": "Ancient Terrors Lurk",
+            "level_min": 58,
+            "level_max": 60
+        }
+    ]
+}

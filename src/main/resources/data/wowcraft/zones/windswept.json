@@ -1,0 +1,35 @@
+{
+    "biome_group": "WINDSWEPT",
+    "zones": [
+        {
+            "name": "Galecutter Highlands",
+            "subtitle": "The Wind Never Rests",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Stormwatch Bluffs",
+            "subtitle": "Battered by the Gale",
+            "level_min": 15,
+            "level_max": 22
+        },
+        {
+            "name": "Howling Ridge",
+            "subtitle": "Where Echoes Carry",
+            "level_min": 30,
+            "level_max": 36
+        },
+        {
+            "name": "Tempest Hills",
+            "subtitle": "The Untamed Heights",
+            "level_min": 44,
+            "level_max": 50
+        },
+        {
+            "name": "Windshear Crags",
+            "subtitle": "Carved by Endless Storms",
+            "level_min": 55,
+            "level_max": 60
+        }
+    ]
+}

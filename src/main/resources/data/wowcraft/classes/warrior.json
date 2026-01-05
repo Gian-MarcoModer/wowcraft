@@ -1,0 +1,39 @@
+{
+    "id": "wowcraft:warrior",
+    "display_name": "Warrior",
+    "description": "Masters of martial combat. Warriors use rage to fuel devastating melee attacks and can take tremendous punishment.",
+    "primary_resource": "rage",
+    "base_stats": {
+        "strength": 15,
+        "agility": 8,
+        "intellect": 3,
+        "stamina": 12,
+        "spirit": 5
+    },
+    "stats_per_level": {
+        "strength": 2.0,
+        "agility": 1.0,
+        "intellect": 0.3,
+        "stamina": 1.5,
+        "spirit": 0.5
+    },
+    "starting_abilities": [
+        "wowcraft:heroic_strike",
+        "wowcraft:charge"
+    ],
+    "learnable_abilities": {
+        "4": [
+            "wowcraft:battle_shout"
+        ],
+        "10": [
+            "wowcraft:rend"
+        ],
+        "16": [
+            "wowcraft:overpower"
+        ],
+        "24": [
+            "wowcraft:execute"
+        ]
+    },
+    "icon": "wowcraft:textures/gui/class/warrior.png"
+}

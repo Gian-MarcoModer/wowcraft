@@ -1,0 +1,33 @@
+{
+    "id": "wowcraft:frost_nova",
+    "display_name": "Frost Nova",
+    "description": "Blasts enemies near the caster with cold, freezing them in place.",
+    "icon": "wowcraft:textures/gui/spells/frost_nova.png",
+    "type": "instant",
+    "resource_cost": {
+        "type": "mana",
+        "amount": 25
+    },
+    "cast_time": 0,
+    "cooldown": 25,
+    "gcd": true,
+    "range": 0,
+    "effects": [
+        {
+            "type": "aoe_damage",
+            "school": "frost",
+            "amount": "15 + (intellect * 0.3)",
+            "can_crit": true,
+            "radius": 10
+        },
+        {
+            "type": "slow",
+            "duration": 8.0,
+            "amount": "100"
+        }
+    ],
+    "requirements": {
+        "class": "wowcraft:mage",
+        "min_level": 1
+    }
+}

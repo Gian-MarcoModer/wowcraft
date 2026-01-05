@@ -1,0 +1,42 @@
+{
+    "id": "wowcraft:rogue",
+    "display_name": "Rogue",
+    "description": "Masters of stealth and subterfuge. Rogues use energy and combo points to deliver devastating burst damage from the shadows.",
+    "primary_resource": "energy",
+    "base_stats": {
+        "strength": 6,
+        "agility": 15,
+        "intellect": 5,
+        "stamina": 10,
+        "spirit": 7
+    },
+    "stats_per_level": {
+        "strength": 0.8,
+        "agility": 2.2,
+        "intellect": 0.5,
+        "stamina": 1.2,
+        "spirit": 0.8
+    },
+    "starting_abilities": [
+        "wowcraft:sinister_strike",
+        "wowcraft:stealth"
+    ],
+    "learnable_abilities": {
+        "4": [
+            "wowcraft:eviscerate"
+        ],
+        "6": [
+            "wowcraft:sprint"
+        ],
+        "10": [
+            "wowcraft:backstab"
+        ],
+        "16": [
+            "wowcraft:shadowstep"
+        ],
+        "24": [
+            "wowcraft:kidney_shot"
+        ]
+    },
+    "icon": "wowcraft:textures/gui/class/rogue.png"
+}

@@ -1,0 +1,35 @@
+{
+    "biome_group": "MUSHROOM",
+    "zones": [
+        {
+            "name": "Sporemist Isle",
+            "subtitle": "The Fungal Paradise",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Mycelium Sanctuary",
+            "subtitle": "Where Silence Grows",
+            "level_min": 15,
+            "level_max": 22
+        },
+        {
+            "name": "Shroomhaven",
+            "subtitle": "The Peaceful Anomaly",
+            "level_min": 30,
+            "level_max": 38
+        },
+        {
+            "name": "Capstone Shores",
+            "subtitle": "Giants of Spore",
+            "level_min": 45,
+            "level_max": 52
+        },
+        {
+            "name": "Glowcap Island",
+            "subtitle": "Bioluminescent Dreams",
+            "level_min": 56,
+            "level_max": 60
+        }
+    ]
+}

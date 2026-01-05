@@ -1,0 +1,28 @@
+{
+    "id": "wowcraft:heroic_strike",
+    "display_name": "Heroic Strike",
+    "description": "A strong attack that deals bonus physical damage.",
+    "icon": "wowcraft:textures/gui/spells/heroic_strike.png",
+    "type": "instant",
+    "resource_cost": {
+        "type": "rage",
+        "amount": 15
+    },
+    "cast_time": 0,
+    "cooldown": 0,
+    "gcd": true,
+    "range": 5,
+    "effects": [
+        {
+            "type": "damage",
+            "school": "physical",
+            "amount": "11 + (strength * 0.3) + (level * 1.5)",
+            "can_crit": true
+        }
+    ],
+    "requirements": {
+        "class": "wowcraft:warrior",
+        "min_level": 1,
+        "requires_target": true
+    }
+}

@@ -1,0 +1,33 @@
+{
+    "id": "wowcraft:fireball",
+    "display_name": "Fireball",
+    "description": "Hurls a fiery ball that causes Fire damage.",
+    "icon": "wowcraft:textures/gui/spells/fireball.png",
+    "type": "cast",
+    "resource_cost": {
+        "type": "mana",
+        "amount": 30
+    },
+    "cast_time": 2.5,
+    "cooldown": 0,
+    "gcd": true,
+    "range": 35,
+    "effects": [
+        {
+            "type": "projectile",
+            "projectile": "wowcraft:fireball_projectile",
+            "speed": 1.5
+        },
+        {
+            "type": "damage",
+            "school": "fire",
+            "amount": "20 + (intellect * 0.5) + (level * 2)",
+            "can_crit": true
+        }
+    ],
+    "requirements": {
+        "class": "wowcraft:mage",
+        "min_level": 1,
+        "requires_target": true
+    }
+}

@@ -1,0 +1,35 @@
+{
+    "biome_group": "JUNGLE",
+    "zones": [
+        {
+            "name": "Serpent's Canopy",
+            "subtitle": "The Green Labyrinth",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Embervine Jungle",
+            "subtitle": "Where Vines Devour Light",
+            "level_min": 16,
+            "level_max": 22
+        },
+        {
+            "name": "Thunderleaf Wilds",
+            "subtitle": "Rain Never Stops",
+            "level_min": 30,
+            "level_max": 36
+        },
+        {
+            "name": "Jadeclaw Basin",
+            "subtitle": "Predators Lurk Below",
+            "level_min": 44,
+            "level_max": 50
+        },
+        {
+            "name": "Strangleroot Depths",
+            "subtitle": "The Living Maze",
+            "level_min": 55,
+            "level_max": 60
+        }
+    ]
+}

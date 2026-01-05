@@ -1,0 +1,35 @@
+{
+    "biome_group": "MOUNTAIN",
+    "zones": [
+        {
+            "name": "Stormcrest Peaks",
+            "subtitle": "Where Lightning Strikes",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Ironspine Summit",
+            "subtitle": "The Roof of the World",
+            "level_min": 18,
+            "level_max": 24
+        },
+        {
+            "name": "Cloudpiercer Heights",
+            "subtitle": "Above the Mists",
+            "level_min": 32,
+            "level_max": 38
+        },
+        {
+            "name": "Frosthorn Mountains",
+            "subtitle": "Eternal Snow Crowns All",
+            "level_min": 46,
+            "level_max": 52
+        },
+        {
+            "name": "Granite Throne",
+            "subtitle": "The Unyielding Stone",
+            "level_min": 56,
+            "level_max": 60
+        }
+    ]
+}

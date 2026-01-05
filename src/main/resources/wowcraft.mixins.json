@@ -1,0 +1,18 @@
+{
+    "required": true,
+    "package": "com.gianmarco.wowcraft.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "mixins": [
+        "ArmorEquipMixin",
+        "HungerLogicMixin",
+        "LivingEntityMixin",
+        "MobMixin",
+        "MobSpawnMixin",
+        "PackMobGoalMixin",
+        "PackMobSunlightMixin",
+        "PlayerTickMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

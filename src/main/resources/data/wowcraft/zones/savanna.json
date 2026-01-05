@@ -1,0 +1,35 @@
+{
+    "biome_group": "SAVANNA",
+    "zones": [
+        {
+            "name": "Thornveld Plains",
+            "subtitle": "The Golden Grasslands",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Lionsmane Savanna",
+            "subtitle": "Hunters Stalk the Grass",
+            "level_min": 12,
+            "level_max": 18
+        },
+        {
+            "name": "Acacia Flats",
+            "subtitle": "Scattered Shade Endures",
+            "level_min": 25,
+            "level_max": 32
+        },
+        {
+            "name": "Drywind Plateau",
+            "subtitle": "Sun-Baked and Defiant",
+            "level_min": 40,
+            "level_max": 46
+        },
+        {
+            "name": "Rustmane Basin",
+            "subtitle": "Where the Wild Roams",
+            "level_min": 52,
+            "level_max": 58
+        }
+    ]
+}

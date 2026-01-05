@@ -1,0 +1,38 @@
+{
+    "id": "wowcraft:charge",
+    "display_name": "Charge",
+    "description": "Charge to an enemy, stunning them and generating rage.",
+    "icon": "wowcraft:textures/gui/spells/charge.png",
+    "type": "instant",
+    "resource_cost": {
+        "type": "rage",
+        "amount": 0
+    },
+    "resource_gain": {
+        "type": "rage",
+        "amount": 15
+    },
+    "cast_time": 0,
+    "cooldown": 15,
+    "gcd": false,
+    "range": {
+        "min": 8,
+        "max": 25
+    },
+    "effects": [
+        {
+            "type": "dash_to_target",
+            "speed": 3.0
+        },
+        {
+            "type": "stun",
+            "duration": 1.0
+        }
+    ],
+    "requirements": {
+        "class": "wowcraft:warrior",
+        "min_level": 1,
+        "requires_target": true,
+        "requires_combat": false
+    }
+}

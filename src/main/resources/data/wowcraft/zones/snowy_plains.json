@@ -1,0 +1,35 @@
+{
+    "biome_group": "SNOWY_PLAINS",
+    "zones": [
+        {
+            "name": "Frostwind Tundra",
+            "subtitle": "The Frozen Expanse",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Glacial Reach",
+            "subtitle": "Where Winter Never Ends",
+            "level_min": 15,
+            "level_max": 22
+        },
+        {
+            "name": "Shatterice Flats",
+            "subtitle": "Land of Eternal Cold",
+            "level_min": 28,
+            "level_max": 35
+        },
+        {
+            "name": "Northwind Basin",
+            "subtitle": "The Howling White",
+            "level_min": 42,
+            "level_max": 48
+        },
+        {
+            "name": "Rimeveil Plains",
+            "subtitle": "Beneath the Frozen Sky",
+            "level_min": 54,
+            "level_max": 60
+        }
+    ]
+}

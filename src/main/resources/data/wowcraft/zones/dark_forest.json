@@ -1,0 +1,35 @@
+{
+    "biome_group": "DARK_FOREST",
+    "zones": [
+        {
+            "name": "Shadowmire Woods",
+            "subtitle": "Light Fears to Enter",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Grimhollow Thicket",
+            "subtitle": "The Watching Dark",
+            "level_min": 18,
+            "level_max": 25
+        },
+        {
+            "name": "Duskmantle Forest",
+            "subtitle": "Twilight's Domain",
+            "level_min": 32,
+            "level_max": 38
+        },
+        {
+            "name": "Wraithwood Depths",
+            "subtitle": "Where Shadows Breathe",
+            "level_min": 45,
+            "level_max": 52
+        },
+        {
+            "name": "Bleakbough Hollow",
+            "subtitle": "The Silent Canopy",
+            "level_min": 56,
+            "level_max": 60
+        }
+    ]
+}

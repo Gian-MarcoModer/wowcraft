@@ -1,0 +1,25 @@
+{
+    "id": "wowcraft:blink",
+    "display_name": "Blink",
+    "description": "Teleports the caster 20 blocks forward.",
+    "icon": "wowcraft:textures/gui/spells/blink.png",
+    "type": "instant",
+    "resource_cost": {
+        "type": "mana",
+        "amount": 15
+    },
+    "cast_time": 0,
+    "cooldown": 15,
+    "gcd": true,
+    "range": 0,
+    "effects": [
+        {
+            "type": "teleport",
+            "amount": "20"
+        }
+    ],
+    "requirements": {
+        "class": "wowcraft:mage",
+        "min_level": 4
+    }
+}

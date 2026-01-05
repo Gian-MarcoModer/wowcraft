@@ -1,0 +1,27 @@
+{
+    "id": "wowcraft:battle_shout",
+    "display_name": "Battle Shout",
+    "description": "The warrior shouts, increasing attack power for nearby party members.",
+    "icon": "wowcraft:textures/gui/spells/battle_shout.png",
+    "type": "instant",
+    "resource_cost": {
+        "type": "rage",
+        "amount": 10
+    },
+    "cast_time": 0,
+    "cooldown": 0,
+    "gcd": true,
+    "range": 0,
+    "effects": [
+        {
+            "type": "buff",
+            "buff_id": "wowcraft:battle_shout",
+            "duration": 120.0,
+            "amount": "strength * 0.1"
+        }
+    ],
+    "requirements": {
+        "class": "wowcraft:warrior",
+        "min_level": 4
+    }
+}

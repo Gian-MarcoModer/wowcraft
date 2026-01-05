@@ -1,0 +1,35 @@
+{
+    "biome_group": "CHERRY_GROVE",
+    "zones": [
+        {
+            "name": "Blossomfall Gardens",
+            "subtitle": "Petals on the Wind",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Sakura Vale",
+            "subtitle": "The Pink Sea",
+            "level_min": 12,
+            "level_max": 18
+        },
+        {
+            "name": "Petalwind Heights",
+            "subtitle": "Where Beauty Blooms",
+            "level_min": 26,
+            "level_max": 32
+        },
+        {
+            "name": "Roselight Meadow",
+            "subtitle": "Dawn's Gentle Touch",
+            "level_min": 38,
+            "level_max": 45
+        },
+        {
+            "name": "Silkpetal Grove",
+            "subtitle": "Tranquil and Eternal",
+            "level_min": 50,
+            "level_max": 58
+        }
+    ]
+}

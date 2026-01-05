@@ -1,0 +1,35 @@
+{
+    "biome_group": "BADLANDS",
+    "zones": [
+        {
+            "name": "Rustspire Canyon",
+            "subtitle": "The Painted Wastes",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Crimson Mesa",
+            "subtitle": "Blood-Red Stone Rises",
+            "level_min": 16,
+            "level_max": 22
+        },
+        {
+            "name": "Shatterstone Gulch",
+            "subtitle": "Broken Earth Endures",
+            "level_min": 30,
+            "level_max": 36
+        },
+        {
+            "name": "Scorchrift Badlands",
+            "subtitle": "The Burning Canyons",
+            "level_min": 44,
+            "level_max": 50
+        },
+        {
+            "name": "Dustwalker's Crossing",
+            "subtitle": "Traveler's Last Rest",
+            "level_min": 55,
+            "level_max": 60
+        }
+    ]
+}

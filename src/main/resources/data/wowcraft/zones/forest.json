@@ -1,0 +1,35 @@
+{
+    "biome_group": "FOREST",
+    "zones": [
+        {
+            "name": "Willowshade Woods",
+            "subtitle": "Ancient Boughs Whisper",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Emerald Thicket",
+            "subtitle": "Heart of the Greenwood",
+            "level_min": 10,
+            "level_max": 16
+        },
+        {
+            "name": "Silverleaf Grove",
+            "subtitle": "Dappled Light Falls",
+            "level_min": 22,
+            "level_max": 28
+        },
+        {
+            "name": "Thornwatch Forest",
+            "subtitle": "Guardians of the Wild",
+            "level_min": 35,
+            "level_max": 42
+        },
+        {
+            "name": "Mossheart Timberland",
+            "subtitle": "Old Growth Endures",
+            "level_min": 48,
+            "level_max": 55
+        }
+    ]
+}

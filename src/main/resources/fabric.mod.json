@@ -1,0 +1,39 @@
+{
+    "schemaVersion": 1,
+    "id": "wowcraft",
+    "version": "${version}",
+    "name": "WowCraft",
+    "description": "A Minecraft mod inspired by World of Warcraft Classic, featuring class systems, abilities, and custom UI.",
+    "authors": [
+        "Gian-Marco"
+    ],
+    "contact": {
+        "homepage": "",
+        "sources": ""
+    },
+    "license": "All-Rights-Reserved",
+    "icon": "assets/wowcraft/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "com.gianmarco.wowcraft.WowCraft"
+        ],
+        "client": [
+            "com.gianmarco.wowcraft.WowCraftClient"
+        ]
+    },
+    "mixins": [
+        "wowcraft.mixins.json",
+        {
+            "config": "wowcraft.client.mixins.json",
+            "environment": "client"
+        }
+    ],
+    "depends": {
+        "fabricloader": ">=0.16.10",
+        "minecraft": "~1.21.5",
+        "java": ">=21",
+        "fabric-api": "*"
+    },
+    "suggests": {}
+}

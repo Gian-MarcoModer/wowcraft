@@ -1,0 +1,36 @@
+{
+    "id": "wowcraft:mage",
+    "display_name": "Mage",
+    "description": "Masters of arcane magic. Mages wield fire, frost, and arcane energies to devastate their enemies from afar.",
+    "primary_resource": "mana",
+    "base_stats": {
+        "strength": 5,
+        "agility": 5,
+        "intellect": 15,
+        "stamina": 8,
+        "spirit": 10
+    },
+    "stats_per_level": {
+        "strength": 0.5,
+        "agility": 0.5,
+        "intellect": 2.0,
+        "stamina": 1.0,
+        "spirit": 1.5
+    },
+    "starting_abilities": [
+        "wowcraft:fireball",
+        "wowcraft:frost_nova"
+    ],
+    "learnable_abilities": {
+        "4": [
+            "wowcraft:blink"
+        ],
+        "10": [
+            "wowcraft:polymorph"
+        ],
+        "20": [
+            "wowcraft:arcane_missiles"
+        ]
+    },
+    "icon": "wowcraft:textures/gui/class/mage.png"
+}

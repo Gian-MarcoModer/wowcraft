@@ -1,0 +1,35 @@
+{
+    "biome_group": "TAIGA",
+    "zones": [
+        {
+            "name": "Pinecrest Wilds",
+            "subtitle": "Scent of Ancient Pines",
+            "level_min": 1,
+            "level_max": 5
+        },
+        {
+            "name": "Wolfsong Taiga",
+            "subtitle": "The Pack Runs Free",
+            "level_min": 14,
+            "level_max": 20
+        },
+        {
+            "name": "Frostbark Forest",
+            "subtitle": "Cold Winds Through the Needles",
+            "level_min": 28,
+            "level_max": 34
+        },
+        {
+            "name": "Stonepine Ridge",
+            "subtitle": "Where Mountains Meet Trees",
+            "level_min": 42,
+            "level_max": 48
+        },
+        {
+            "name": "Snowshroud Timberlands",
+            "subtitle": "Winter's Quiet Embrace",
+            "level_min": 54,
+            "level_max": 60
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew compileJava:*)",
+      "Bash(./gradlew build:*)",
+      "Bash(echo \"After restarting and testing, run this command to see the debug output:\ncd ''c:\\\\Users\\\\gianm\\\\Proton Drive\\\\gian-marco.moder\\\\My files\\\\Documents\\\\MinecraftMod'' && tail -100 run/logs/latest.log | grep ''Drawing''\")",
+      "Bash(./gradlew:*)",
+      "Bash(dir:*)",
+      "Bash(powershell -NoProfile -Command:*)",
+      "Bash(del \"src\\\\main\\\\java\\\\com\\\\gianmarco\\\\wowcraft\\\\mixin\\\\PackMobStationaryMixin.java\")"
+    ]
+  }
+}

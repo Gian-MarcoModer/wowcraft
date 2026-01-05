@@ -1,0 +1,15 @@
+{
+    "required": true,
+    "package": "com.gianmarco.wowcraft.mixin.client",
+    "compatibilityLevel": "JAVA_21",
+    "client": [
+        "ItemTooltipMixin",
+        "LocalPlayerMixin",
+        "EntityRenderDispatcherMixin",
+        "InGameHudMixin",
+        "EntityRendererMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
