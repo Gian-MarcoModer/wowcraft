@@ -42,26 +42,37 @@ public class POIGenerator {
         // Generate different POI types based on biome
         // For now, use simple defaults - will be replaced by config system later
 
-        // 4-6 Camps per region (increased from 2-3)
-        int campCount = 4 + random.nextInt(3);
+        // 8-12 individual Camps per region (single 3-5 mob spawn points)
+        int campCount = 8 + random.nextInt(5);
         for (int i = 0; i < campCount; i++) {
-            BlockPos campPos = findValidCampLocation(level, regionCenter, REGION_SIZE, random);
+            BlockPos campPos = findValidCampLocation(level, regionCenter, REGION_SIZE, random, pois);
             if (campPos != null) {
-                CampPOI camp = new CampPOI(
-                        UUID.randomUUID(),
-                        campPos,
-                        30, // radius
-                        2, // min packs
-                        4, // max packs
-                        15 // pack spacing
-                );
+                CampPOI camp = new CampPOI(UUID.randomUUID(), campPos);
                 pois.add(camp);
                 WowCraft.LOGGER.debug("Generated CAMP at {}", campPos);
             }
         }
 
-        // 3-5 Wildlife areas per region (increased from 1-2)
-        int wildlifeCount = 3 + random.nextInt(3);
+        // 1-2 Compounds per region (multi-camp clusters - rare special encounters)
+        int compoundCount = 1 + random.nextInt(2);
+        for (int i = 0; i < compoundCount; i++) {
+            BlockPos compoundPos = findValidCampLocation(level, regionCenter, REGION_SIZE, random, pois);
+            if (compoundPos != null) {
+                CompoundPOI compound = new CompoundPOI(
+                        UUID.randomUUID(),
+                        compoundPos,
+                        40, // radius
+                        2, // min camps
+                        4, // max camps
+                        20 // camp spacing
+                );
+                pois.add(compound);
+                WowCraft.LOGGER.debug("Generated COMPOUND at {}", compoundPos);
+            }
+        }
+
+        // 1-2 Wildlife areas per region (rare peaceful encounters)
+        int wildlifeCount = 1 + random.nextInt(2);
         for (int i = 0; i < wildlifeCount; i++) {
             BlockPos wildlifePos = findRandomLocation(level, regionCenter, REGION_SIZE, random, pois);
             if (wildlifePos != null) {
@@ -110,7 +121,7 @@ public class POIGenerator {
      * Find a valid location for a camp (prefers flat areas).
      */
     private static BlockPos findValidCampLocation(ServerLevel level, BlockPos regionCenter, int regionSize,
-            Random random) {
+            Random random, List<PointOfInterest> existingPOIs) {
 
         int attempts = 20;
         for (int i = 0; i < attempts; i++) {
@@ -120,13 +131,13 @@ public class POIGenerator {
             BlockPos testPos = regionCenter.offset(offsetX, 0, offsetZ);
             BlockPos surfacePos = findSurfacePos(level, testPos);
 
-            if (surfacePos != null && isFlatEnough(level, surfacePos)) {
+            if (surfacePos != null && isFlatEnough(level, surfacePos) && !isTooCloseToExisting(surfacePos, existingPOIs)) {
                 return surfacePos;
             }
         }
 
-        // Fallback: just find any surface
-        return findRandomLocation(level, regionCenter, regionSize, random, Collections.emptyList());
+        // Fallback: just find any surface (with distance check)
+        return findRandomLocation(level, regionCenter, regionSize, random, existingPOIs);
     }
 
     /**
@@ -290,14 +301,26 @@ public class POIGenerator {
      * Find surface position at XZ coordinates.
      */
     private static BlockPos findSurfacePos(ServerLevel level, BlockPos pos) {
-        // Start from high up and go down
-        for (int y = 128; y > -64; y--) {
-            BlockPos testPos = new BlockPos(pos.getX(), y, pos.getZ());
-            BlockState state = level.getBlockState(testPos);
-            BlockState above = level.getBlockState(testPos.above());
+        // Check if chunk is loaded first to prevent cascading chunk loads during world generation
+        if (!level.isLoaded(pos)) {
+            return null;
+        }
 
-            if (state.isSolid() && !above.isSolid() && above.getBlock() != Blocks.WATER) {
-                return testPos.above();
+        // Use heightmap instead of Y-loop (eliminates 192 chunk accesses per call)
+        int y = level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+            pos.getX(), pos.getZ());
+
+        // Validate Y is within world bounds
+        if (y >= level.getMinY() && y <= level.getMaxY() - 2) {
+            BlockPos surfacePos = new BlockPos(pos.getX(), y, pos.getZ());
+
+            // Quick validation
+            BlockState below = level.getBlockState(surfacePos.below());
+            BlockState at = level.getBlockState(surfacePos);
+
+            if ((below.isSuffocating(level, surfacePos.below()) || below.blocksMotion()) &&
+                !at.isSuffocating(level, surfacePos) && at.getBlock() != Blocks.WATER) {
+                return surfacePos;
             }
         }
 

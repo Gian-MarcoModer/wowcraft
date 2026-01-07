@@ -7,6 +7,7 @@ import com.gianmarco.wowcraft.poi.POIGenerator;
 import com.gianmarco.wowcraft.poi.POIManager;
 import com.gianmarco.wowcraft.poi.POISaveData;
 import com.gianmarco.wowcraft.poi.PointOfInterest;
+import com.gianmarco.wowcraft.spawn.SpawnSystemManager;
 import com.gianmarco.wowcraft.zone.BiomeGroup;
 import com.gianmarco.wowcraft.zone.ZoneRegion;
 import com.gianmarco.wowcraft.zone.ZoneSaveData;
@@ -69,6 +70,9 @@ public class MobPackManager {
      * Now just buffers chunks for background processing to avoid lag.
      */
     public static void onChunkLoad(ServerLevel level, ChunkPos chunkPos) {
+        // NEW SPAWN SYSTEM: Queue chunks for async processing (non-blocking)
+        SpawnSystemManager.onChunkLoad(level, chunkPos);
+
         // Only in overworld
         if (level.dimension() != Level.OVERWORLD) {
             return;
@@ -95,11 +99,11 @@ public class MobPackManager {
             return;
         }
 
-        // Process up to 2 chunks per tick to avoid lag (reduced from 5)
+        // Process up to 1 chunk per tick to avoid lag (reduced from 2)
         int processedThisTick = 0;
         Iterator<Long> iterator = pendingChunks.iterator();
 
-        while (iterator.hasNext() && processedThisTick < 2) {
+        while (iterator.hasNext() && processedThisTick < 1) {
             long chunkKey = iterator.next();
             iterator.remove();
 
@@ -171,6 +175,10 @@ public class MobPackManager {
         // Mark as processed
         processedChunks.add(chunkKey);
 
+        // OLD MOB PACK SPAWNING - DISABLED IN FAVOR OF NEW SPAWN SYSTEM
+        // The new SpawnSystemManager now handles all mob spawning
+        // This old code was causing double-spawning and excessive mob density
+        /*
         // Spawn packs at POI locations (limit to 1 pack per chunk processing to avoid lag)
         Random random = new Random(chunkKey ^ level.getSeed());
         int spawnsThisChunk = 0;
@@ -225,6 +233,7 @@ public class MobPackManager {
                 }
             }
         }
+        */
     }
 
     /**
@@ -414,9 +423,9 @@ public class MobPackManager {
                 }
             }
 
-            // Random offset from pack center (within 4 blocks)
-            int offsetX = random.nextInt(9) - 4;
-            int offsetZ = random.nextInt(9) - 4;
+            // Random offset from pack center (within 8 blocks for better spread)
+            int offsetX = random.nextInt(17) - 8;
+            int offsetZ = random.nextInt(17) - 8;
             BlockPos mobPos = center.offset(offsetX, 0, offsetZ);
 
             // Adjust to surface
@@ -448,6 +457,9 @@ public class MobPackManager {
     public static void onServerTick(ServerLevel level) {
         long currentTick = level.getGameTime();
 
+        // NEW SPAWN SYSTEM: Process queued spawn generation
+        SpawnSystemManager.onServerTick(level);
+
         // Process pending chunks gradually (every tick, up to 5 chunks)
         processPendingChunks(level);
 
@@ -465,6 +477,9 @@ public class MobPackManager {
      * Called when a mob dies to track respawn.
      */
     public static void onMobDeath(LivingEntity mob, ServerLevel level) {
+        // NEW SPAWN SYSTEM: Track mob death for respawns
+        SpawnSystemManager.onMobDeath(mob, level);
+
         MobData data = mob.getAttached(PlayerDataRegistry.MOB_DATA);
         if (data == null || data.packId() == null) {
             return; // Not a pack mob
@@ -508,6 +523,9 @@ public class MobPackManager {
      * Clear all data (on world unload).
      */
     public static void clear() {
+        // NEW SPAWN SYSTEM: Clear spawn data
+        SpawnSystemManager.clear();
+
         processedChunks.clear();
         allPacks.clear();
         mobToPackMap.clear();

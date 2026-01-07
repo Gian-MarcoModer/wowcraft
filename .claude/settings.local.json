@@ -7,7 +7,10 @@
       "Bash(./gradlew:*)",
       "Bash(dir:*)",
       "Bash(powershell -NoProfile -Command:*)",
-      "Bash(del \"src\\\\main\\\\java\\\\com\\\\gianmarco\\\\wowcraft\\\\mixin\\\\PackMobStationaryMixin.java\")"
+      "Bash(del \"src\\\\main\\\\java\\\\com\\\\gianmarco\\\\wowcraft\\\\mixin\\\\PackMobStationaryMixin.java\")",
+      "Bash(del \"src\\\\main\\\\java\\\\com\\\\gianmarco\\\\wowcraft\\\\entity\\\\pack\\\\PackWolf.java\")",
+      "Bash(grep:*)",
+      "Bash(.gradlew build:*)"
     ]
   }
 }

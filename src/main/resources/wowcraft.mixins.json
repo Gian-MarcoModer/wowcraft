@@ -10,7 +10,8 @@
         "MobSpawnMixin",
         "PackMobGoalMixin",
         "PackMobSunlightMixin",
-        "PlayerTickMixin"
+        "PlayerTickMixin",
+        "RoadTickMixin"
     ],
     "injectors": {
         "defaultRequire": 1

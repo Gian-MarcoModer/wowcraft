@@ -1,7 +1,8 @@
 package com.gianmarco.wowcraft.mobpack;
 
 import com.gianmarco.wowcraft.WowCraft;
-import com.gianmarco.wowcraft.entity.MobLevelManager;
+import com.gianmarco.wowcraft.entity.ModEntities;
+import com.gianmarco.wowcraft.entity.pack.IPackMob;
 import com.gianmarco.wowcraft.playerclass.PlayerDataRegistry;
 import com.gianmarco.wowcraft.entity.MobData;
 import com.gianmarco.wowcraft.zone.BiomeGroup;
@@ -119,13 +120,14 @@ public class SpawnedMobPack {
             return;
         }
 
-        // Get entity type from registry - returns Optional in 1.21.5
-        var entityTypeOpt = BuiltInRegistries.ENTITY_TYPE.getOptional(mobSlot.getMobType());
-        if (entityTypeOpt.isEmpty()) {
-            WowCraft.LOGGER.error("Unknown mob type: {}", mobSlot.getMobType());
+        // Map vanilla mob types to custom pack entities
+        ResourceLocation requestedType = mobSlot.getMobType();
+        EntityType<?> entityType = mapToPackEntity(requestedType);
+
+        if (entityType == null) {
+            WowCraft.LOGGER.error("Unknown mob type: {}", requestedType);
             return;
         }
-        EntityType<?> entityType = entityTypeOpt.get();
 
         // Spawn the entity using create() with proper 1.21.5 signature
         Entity entity = entityType.create(
@@ -153,7 +155,7 @@ public class SpawnedMobPack {
             mob.setAttached(PlayerDataRegistry.MOB_DATA, new MobData(targetLevel, zoneTier, packId));
 
             // Re-apply level stats with our target level
-            applyPackLevel(mob, targetLevel);
+            applyPackLevel(mob, targetLevel, requestedType);
 
             // Make mob stay near spawn position (leash to pack area)
             makePackMobTerritorial(mob, mobSlot.getSpawnPos());
@@ -172,6 +174,46 @@ public class SpawnedMobPack {
     }
 
     /**
+     * Map vanilla entity types to custom pack entities.
+     * Returns null if the mob type is not supported for packs.
+     */
+    @Nullable
+    private EntityType<?> mapToPackEntity(ResourceLocation vanillaType) {
+        String path = vanillaType.getPath();
+
+        return switch (path) {
+            // Zombie variants
+            case "zombie" -> ModEntities.PACK_ZOMBIE;
+            case "husk" -> ModEntities.PACK_HUSK;
+            case "drowned" -> ModEntities.PACK_DROWNED;
+            case "zombie_villager" -> ModEntities.PACK_ZOMBIE_VILLAGER;
+
+            // Skeleton variants
+            case "skeleton" -> ModEntities.PACK_SKELETON;
+            case "stray" -> ModEntities.PACK_STRAY;
+
+            // Spider variants
+            case "spider" -> ModEntities.PACK_SPIDER;
+            case "cave_spider" -> ModEntities.PACK_CAVE_SPIDER;
+
+            // Other hostiles
+            case "creeper" -> ModEntities.PACK_CREEPER;
+            case "witch" -> ModEntities.PACK_WITCH;
+            case "slime" -> ModEntities.PACK_SLIME;
+
+            // Illagers
+            case "vindicator" -> ModEntities.PACK_VINDICATOR;
+            case "pillager" -> ModEntities.PACK_PILLAGER;
+
+            default -> {
+                // For unsupported types (passive mobs, warden), use vanilla
+                var opt = BuiltInRegistries.ENTITY_TYPE.getOptional(vanillaType);
+                yield opt.orElse(null);
+            }
+        };
+    }
+
+    /**
      * Makes a pack mob territorial by restricting its movement range.
      * Mobs stay stationary when idle, but can chase when aggroed.
      */
@@ -179,16 +221,21 @@ public class SpawnedMobPack {
         // Set home position with 24 block leash - they can chase but will return
         mob.restrictTo(homePos, 24);
 
-        // Stationary behavior is added via PackMobGoalMixin
-
-        WowCraft.LOGGER.debug("Made mob territorial at {} with 24 block leash and stationary AI", homePos);
+        // If this is a custom pack mob, set its home position for the behavior component
+        if (mob instanceof com.gianmarco.wowcraft.entity.pack.IPackMob packMob) {
+            packMob.setHomePosition(homePos);
+            WowCraft.LOGGER.debug("Set pack mob home position at {} with custom AI", homePos);
+        } else {
+            // Fallback: Stationary behavior is added via PackMobGoalMixin for vanilla mobs
+            WowCraft.LOGGER.debug("Made vanilla mob territorial at {} with 24 block leash", homePos);
+        }
     }
 
     /**
      * Apply level-based stats to a pack mob.
      * Mirrors MobLevelManager but uses our target level.
      */
-    private void applyPackLevel(LivingEntity mob, int level) {
+    private void applyPackLevel(LivingEntity mob, int level, ResourceLocation mobType) {
         var hpAttr = mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
         var dmgAttr = mob.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
 
@@ -216,25 +263,12 @@ public class SpawnedMobPack {
         // Heal to full
         mob.setHealth(mob.getMaxHealth());
 
-        // Update nameplate
-        String name = mob.getType().getDescription().getString();
-        String color = getZoneColor(level);
-        mob.setCustomName(net.minecraft.network.chat.Component.literal(color + "[Lv." + level + "] §r" + name));
+        // Update nameplate with creative name
+        String name = MobNameGenerator.getName(mobType, zone);
+        // Pack mobs are always hostile -> RED nameplate
+        // Level display is white/grey for now (will be colored based on player level dynamically)
+        mob.setCustomName(net.minecraft.network.chat.Component.literal("§c[Lv." + level + "] " + name));
         mob.setCustomNameVisible(true);
-    }
-
-    private String getZoneColor(int level) {
-        if (level <= 5)
-            return "§a";
-        if (level <= 15)
-            return "§e";
-        if (level <= 25)
-            return "§6";
-        if (level <= 35)
-            return "§c";
-        if (level <= 45)
-            return "§4";
-        return "§5";
     }
 
     /**
@@ -300,16 +334,21 @@ public class SpawnedMobPack {
 
     /**
      * Gets all alive mobs within the social aggro radius of a position.
+     * Uses live entity positions for accurate distance checks.
      */
-    public List<UUID> getAliveMobsWithinRadius(BlockPos center, float radius) {
+    public List<UUID> getAliveMobsWithinRadius(ServerLevel level, BlockPos center, float radius) {
         List<UUID> result = new ArrayList<>();
         double radiusSq = radius * radius;
 
         for (SpawnedMob mob : mobs) {
             if (mob.isAlive() && mob.getEntityId() != null) {
-                double distSq = mob.getSpawnPos().distSqr(center);
-                if (distSq <= radiusSq) {
-                    result.add(mob.getEntityId());
+                // Look up the actual entity to get its current position
+                Entity entity = level.getEntity(mob.getEntityId());
+                if (entity != null && entity.isAlive()) {
+                    double distSq = entity.blockPosition().distSqr(center);
+                    if (distSq <= radiusSq) {
+                        result.add(mob.getEntityId());
+                    }
                 }
             }
         }

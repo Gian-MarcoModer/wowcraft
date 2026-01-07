@@ -43,8 +43,14 @@ public class MobLevelManager {
      * Called when a mob spawns.
      */
     public static void initializeMob(LivingEntity mob) {
-        // Only level enemies (monsters) for now
-        if (!(mob instanceof Enemy)) {
+        // Level enemies (monsters), wolves, and bees
+        boolean isEnemy = mob instanceof Enemy;
+        boolean isWolf = mob.getType() == net.minecraft.world.entity.EntityType.WOLF;
+        boolean isBee = mob.getType() == net.minecraft.world.entity.EntityType.BEE;
+
+        boolean isLevelableMob = isEnemy || isWolf || isBee;
+
+        if (!isLevelableMob) {
             return;
         }
 
@@ -219,27 +225,59 @@ public class MobLevelManager {
     }
 
     /**
-     * Update nameplate to show level with zone-based color.
+     * Update nameplate to show level with hostility-based color.
+     * Follows WoW-style system:
+     * - Hostile mobs (Enemy) -> Red
+     * - Neutral mobs (Wolves) -> Yellow
+     * - Passive mobs (Bees) -> Green
      */
     private static void updateNameplate(LivingEntity mob, int level, int zoneTier) {
-        String name = mob.getType().getDescription().getString();
-        String color = getZoneColor(zoneTier);
-        mob.setCustomName(Component.literal(color + "[Lv." + level + "] §r" + name));
+        // Get creative name based on biome
+        String name = getCreativeMobName(mob);
+        String color = getMobHostilityColor(mob);
+        mob.setCustomName(Component.literal(color + "[Lv." + level + "] " + name));
         mob.setCustomNameVisible(true);
     }
 
     /**
-     * Get color code for nameplate based on zone tier.
+     * Get creative name for mob based on its biome.
      */
-    private static String getZoneColor(int zoneTier) {
-        return switch (zoneTier) {
-            case 0 -> "§a"; // Green - very safe
-            case 1 -> "§e"; // Yellow - safe
-            case 2 -> "§6"; // Gold - moderate
-            case 3 -> "§c"; // Light red - dangerous
-            case 4 -> "§4"; // Dark red - very dangerous
-            default -> "§5"; // Purple - deadly
-        };
+    private static String getCreativeMobName(LivingEntity mob) {
+        // Get biome at mob position
+        BlockPos pos = mob.blockPosition();
+        Holder<Biome> biomeHolder = mob.level().getBiome(pos);
+
+        // Convert to BiomeGroup
+        ResourceKey<Biome> biomeKey = biomeHolder.unwrapKey().orElse(null);
+        com.gianmarco.wowcraft.zone.BiomeGroup biomeGroup =
+            com.gianmarco.wowcraft.zone.BiomeGroup.fromBiome(biomeKey);
+
+        // Get mob type
+        net.minecraft.resources.ResourceLocation mobType =
+            net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType());
+
+        // Get creative name
+        return com.gianmarco.wowcraft.mobpack.MobNameGenerator.getName(mobType, biomeGroup);
+    }
+
+    /**
+     * Get color based on mob hostility type.
+     */
+    private static String getMobHostilityColor(LivingEntity mob) {
+        // Hostile mobs -> Red
+        if (mob instanceof Enemy) {
+            return "§c";
+        }
+        // Wolves -> Yellow (neutral, can be hostile if provoked)
+        if (mob.getType() == net.minecraft.world.entity.EntityType.WOLF) {
+            return "§e";
+        }
+        // Bees -> Green (passive unless provoked)
+        if (mob.getType() == net.minecraft.world.entity.EntityType.BEE) {
+            return "§a";
+        }
+        // Default to white
+        return "§f";
     }
 
     /**

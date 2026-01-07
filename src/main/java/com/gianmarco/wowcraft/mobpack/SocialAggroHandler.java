@@ -41,6 +41,7 @@ public class SocialAggroHandler {
 
         // Get all alive pack mobs within social aggro radius of the attacked mob
         List<UUID> nearbyMobIds = pack.getAliveMobsWithinRadius(
+                level,
                 mob.blockPosition(),
                 pack.getSocialAggroRadius());
 

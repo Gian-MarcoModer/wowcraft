@@ -50,14 +50,7 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
-        TEMPLATES.put("plains_wolf_pack", new MobPackTemplate(
-                "plains_wolf_pack",
-                Set.of(BiomeGroup.PLAINS),
-                List.of(
-                        new MobEntry(ResourceLocation.parse("minecraft:wolf"), 2, 4, 100)),
-                3, 5,
-                10.0f, // Wolves have larger pack coordination
-                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+        // Note: Wolves use vanilla spawning now - they are not hostile by default
 
         TEMPLATES.put("zombie_pack", new MobPackTemplate(
                 "zombie_pack",
@@ -79,14 +72,7 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_SOCIAL_AGGRO_RADIUS,
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
-        TEMPLATES.put("polar_bear_pack", new MobPackTemplate(
-                "polar_bear_pack",
-                Set.of(BiomeGroup.SNOWY_PLAINS),
-                List.of(
-                        new MobEntry(ResourceLocation.parse("minecraft:polar_bear"), 1, 2, 100)),
-                1, 3,
-                8.0f,
-                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+        // Note: Polar bears use vanilla spawning now
 
         // === FOREST PACKS ===
         TEMPLATES.put("skeleton_pack", new MobPackTemplate(
@@ -139,14 +125,7 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
         // === TAIGA PACKS ===
-        TEMPLATES.put("taiga_wolf_pack", new MobPackTemplate(
-                "taiga_wolf_pack",
-                Set.of(BiomeGroup.TAIGA),
-                List.of(
-                        new MobEntry(ResourceLocation.parse("minecraft:wolf"), 3, 5, 100)),
-                3, 6,
-                12.0f,
-                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+        // Note: Wolves use vanilla spawning now
 
         TEMPLATES.put("frozen_undead", new MobPackTemplate(
                 "frozen_undead",
@@ -258,14 +237,7 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
         // === MOUNTAIN & WINDSWEPT PACKS ===
-        TEMPLATES.put("mountain_goat_herd", new MobPackTemplate(
-                "mountain_goat_herd",
-                Set.of(BiomeGroup.MOUNTAIN, BiomeGroup.WINDSWEPT),
-                List.of(
-                        new MobEntry(ResourceLocation.parse("minecraft:goat"), 2, 4, 100)),
-                2, 5,
-                10.0f,
-                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+        // Note: Goats use vanilla spawning now - they are passive
 
         TEMPLATES.put("windswept_skeleton_pack", new MobPackTemplate(
                 "windswept_skeleton_pack",
@@ -278,25 +250,10 @@ public class MobPackTemplateLoader {
                 MobPackTemplate.DEFAULT_RESPAWN_DELAY));
 
         // === CHERRY GROVE PACKS ===
-        TEMPLATES.put("cherry_grove_bee_swarm", new MobPackTemplate(
-                "cherry_grove_bee_swarm",
-                Set.of(BiomeGroup.CHERRY_GROVE),
-                List.of(
-                        new MobEntry(ResourceLocation.parse("minecraft:bee"), 3, 6, 100)),
-                4, 8,
-                15.0f, // Bees swarm aggressively
-                60)); // Faster respawn for bees
+        // Note: Bees use vanilla spawning now - they are not hostile by default
 
         // === MUSHROOM ISLAND PACKS ===
-        // Mushroom islands are peaceful - only mooshrooms
-        TEMPLATES.put("mooshroom_herd", new MobPackTemplate(
-                "mooshroom_herd",
-                Set.of(BiomeGroup.MUSHROOM),
-                List.of(
-                        new MobEntry(ResourceLocation.parse("minecraft:mooshroom"), 2, 4, 100)),
-                2, 5,
-                0.0f, // Passive mobs don't aggro
-                MobPackTemplate.DEFAULT_RESPAWN_DELAY));
+        // Note: Mooshrooms use vanilla spawning now - they are passive
 
         // === CAVE PACKS ===
         TEMPLATES.put("cave_zombie_pack", new MobPackTemplate(

@@ -1,0 +1,92 @@
+# Copy this content into ModEntities.java
+
+## Add to imports (line 4-6 area):
+import com.gianmarco.wowcraft.entity.pack.*;
+
+## Add after existing pack entity imports (after line 17):
+import net.minecraft.world.entity.monster.*;
+
+## Add ResourceLocation IDs (after line 77):
+    private static final ResourceLocation PACK_HUSK_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_husk");
+    private static final ResourceLocation PACK_STRAY_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_stray");
+    private static final ResourceLocation PACK_CAVE_SPIDER_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_cave_spider");
+    private static final ResourceLocation PACK_CREEPER_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_creeper");
+    private static final ResourceLocation PACK_DROWNED_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_drowned");
+    private static final ResourceLocation PACK_ZOMBIE_VILLAGER_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_zombie_villager");
+    private static final ResourceLocation PACK_WITCH_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_witch");
+    private static final ResourceLocation PACK_VINDICATOR_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_vindicator");
+    private static final ResourceLocation PACK_PILLAGER_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_pillager");
+    private static final ResourceLocation PACK_SLIME_ID = ResourceLocation.fromNamespaceAndPath(WowCraft.MOD_ID, "pack_slime");
+
+## Add EntityType registrations (after line 101):
+    public static final EntityType<PackHusk> PACK_HUSK = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_HUSK_ID,
+            EntityType.Builder.<PackHusk>of(PackHusk::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_HUSK_ID)));
+
+    public static final EntityType<PackStray> PACK_STRAY = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_STRAY_ID,
+            EntityType.Builder.<PackStray>of(PackStray::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.99f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_STRAY_ID)));
+
+    public static final EntityType<PackCaveSpider> PACK_CAVE_SPIDER = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_CAVE_SPIDER_ID,
+            EntityType.Builder.<PackCaveSpider>of(PackCaveSpider::new, MobCategory.MONSTER)
+                    .sized(0.7f, 0.5f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_CAVE_SPIDER_ID)));
+
+    public static final EntityType<PackCreeper> PACK_CREEPER = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_CREEPER_ID,
+            EntityType.Builder.<PackCreeper>of(PackCreeper::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.7f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_CREEPER_ID)));
+
+    public static final EntityType<PackDrowned> PACK_DROWNED = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_DROWNED_ID,
+            EntityType.Builder.<PackDrowned>of(PackDrowned::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_DROWNED_ID)));
+
+    public static final EntityType<PackZombieVillager> PACK_ZOMBIE_VILLAGER = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_ZOMBIE_VILLAGER_ID,
+            EntityType.Builder.<PackZombieVillager>of(PackZombieVillager::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_ZOMBIE_VILLAGER_ID)));
+
+    public static final EntityType<PackWitch> PACK_WITCH = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_WITCH_ID,
+            EntityType.Builder.<PackWitch>of(PackWitch::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_WITCH_ID)));
+
+    public static final EntityType<PackVindicator> PACK_VINDICATOR = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_VINDICATOR_ID,
+            EntityType.Builder.<PackVindicator>of(PackVindicator::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_VINDICATOR_ID)));
+
+    public static final EntityType<PackPillager> PACK_PILLAGER = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_PILLAGER_ID,
+            EntityType.Builder.<PackPillager>of(PackPillager::new, MobCategory.MONSTER)
+                    .sized(0.6f, 1.95f).clientTrackingRange(8)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_PILLAGER_ID)));
+
+    public static final EntityType<PackSlime> PACK_SLIME = Registry.register(
+            BuiltInRegistries.ENTITY_TYPE, PACK_SLIME_ID,
+            EntityType.Builder.<PackSlime>of(PackSlime::new, MobCategory.MONSTER)
+                    .sized(2.04f, 2.04f).clientTrackingRange(10)
+                    .build(ResourceKey.create(Registries.ENTITY_TYPE, PACK_SLIME_ID)));
+
+## Add attribute registrations in register() method (after line 110):
+        FabricDefaultAttributeRegistry.register(PACK_HUSK, Zombie.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_STRAY, AbstractSkeleton.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_CAVE_SPIDER, Spider.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_CREEPER, Creeper.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_DROWNED, Zombie.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_ZOMBIE_VILLAGER, Zombie.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_WITCH, Witch.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_VINDICATOR, Vindicator.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_PILLAGER, Pillager.createAttributes());
+        FabricDefaultAttributeRegistry.register(PACK_SLIME, Slime.createAttributes());

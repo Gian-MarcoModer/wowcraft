@@ -6,8 +6,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 
@@ -29,6 +28,25 @@ public class ModEntityRenderers {
 
         // Spell effect ground decal renderer
         EntityRendererRegistry.register(ModEntities.SPELL_EFFECT, SpellEffectRenderer::new);
+
+        // Pack mob renderers - use vanilla renderers since they extend vanilla mobs
+        EntityRendererRegistry.register(ModEntities.PACK_ZOMBIE, ZombieRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_HUSK, HuskRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_DROWNED, DrownedRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_ZOMBIE_VILLAGER, ZombieVillagerRenderer::new);
+
+        EntityRendererRegistry.register(ModEntities.PACK_SKELETON, SkeletonRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_STRAY, StrayRenderer::new);
+
+        EntityRendererRegistry.register(ModEntities.PACK_SPIDER, SpiderRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_CAVE_SPIDER, CaveSpiderRenderer::new);
+
+        EntityRendererRegistry.register(ModEntities.PACK_CREEPER, CreeperRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_WITCH, WitchRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_SLIME, SlimeRenderer::new);
+
+        EntityRendererRegistry.register(ModEntities.PACK_VINDICATOR, VindicatorRenderer::new);
+        EntityRendererRegistry.register(ModEntities.PACK_PILLAGER, PillagerRenderer::new);
 
         WowCraft.LOGGER.info("Registered WowCraft entity renderers");
     }

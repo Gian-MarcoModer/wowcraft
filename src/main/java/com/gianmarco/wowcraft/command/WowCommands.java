@@ -7,6 +7,7 @@ import com.gianmarco.wowcraft.item.WowItem;
 import com.gianmarco.wowcraft.playerclass.PlayerClass;
 import com.gianmarco.wowcraft.playerclass.PlayerDataManager;
 import com.gianmarco.wowcraft.network.NetworkHandler;
+import com.gianmarco.wowcraft.roads.RoadGenerator;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -16,9 +17,11 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import com.gianmarco.wowcraft.mobpack.*;
 import com.gianmarco.wowcraft.zone.BiomeGroup;
@@ -29,6 +32,9 @@ public class WowCommands {
 
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            // Register debug spawn command
+            DebugSpawnCommand.register(dispatcher);
+
             dispatcher.register(Commands.literal("wow")
                     .then(Commands.literal("give")
                             .requires(source -> source.hasPermission(2)) // OPS only
@@ -46,7 +52,24 @@ public class WowCommands {
                                     .then(Commands.argument("template", StringArgumentType.word())
                                             .executes(WowCommands::spawnPack)))
                             .then(Commands.literal("count")
-                                    .executes(WowCommands::countPacks))));
+                                    .executes(WowCommands::countPacks)))
+                    .then(Commands.literal("roads")
+                            .requires(source -> source.hasPermission(2))
+                            .then(Commands.literal("find")
+                                    .executes(WowCommands::findStructures)
+                                    .then(Commands.argument("radius", IntegerArgumentType.integer(100, 5000))
+                                            .then(Commands.argument("count", IntegerArgumentType.integer(1, 20))
+                                                    .executes(WowCommands::findStructuresWithArgs))))
+                            .then(Commands.literal("plan")
+                                    .executes(WowCommands::planRoads))
+                            .then(Commands.literal("build")
+                                    .then(Commands.argument("x", IntegerArgumentType.integer())
+                                            .then(Commands.argument("z", IntegerArgumentType.integer())
+                                                    .executes(WowCommands::buildRoadToPos))))
+                            .then(Commands.literal("status")
+                                    .executes(WowCommands::roadStatus))
+                            .then(Commands.literal("reset")
+                                    .executes(WowCommands::resetRoads))));
         });
     }
 
@@ -237,5 +260,119 @@ public class WowCommands {
         if (available.isEmpty())
             return com.gianmarco.wowcraft.item.BaseItemType.SHORTSWORD;
         return available.get(new java.util.Random().nextInt(available.size()));
+    }
+
+    // === Road Commands ===
+
+    private static int findStructures(CommandContext<CommandSourceStack> context) {
+        return findStructuresInternal(context, 1000, 5);
+    }
+
+    private static int findStructuresWithArgs(CommandContext<CommandSourceStack> context) {
+        int radius = IntegerArgumentType.getInteger(context, "radius");
+        int count = IntegerArgumentType.getInteger(context, "count");
+        return findStructuresInternal(context, radius, count);
+    }
+
+    private static int findStructuresInternal(CommandContext<CommandSourceStack> context, int radius, int maxCount) {
+        try {
+            ServerPlayer player = context.getSource().getPlayerOrException();
+            ServerLevel level = player.serverLevel();
+            BlockPos center = player.blockPosition();
+
+            context.getSource().sendSuccess(
+                    () -> Component.literal("Searching for structures within " + radius + " blocks and building roads..."),
+                    false);
+
+            // Use the force search which also builds roads
+            RoadGenerator.getInstance().forceSearchAndBuild(level, center, radius);
+
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int planRoads(CommandContext<CommandSourceStack> context) {
+        RoadGenerator generator = RoadGenerator.getInstance();
+
+        if (generator.getStructureCount() < 2) {
+            context.getSource().sendFailure(
+                    Component.literal("Need at least 2 structures. Use /wow roads find first."));
+            return 0;
+        }
+
+        try {
+            ServerLevel level = context.getSource().getLevel();
+            int roadsBefore = generator.getTotalRoadsBuilt();
+            generator.buildRoads(level);
+            int roadsBuilt = generator.getTotalRoadsBuilt() - roadsBefore;
+
+            context.getSource().sendSuccess(
+                    () -> Component.literal("Built " + roadsBuilt + " roads instantly."),
+                    true);
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+
+        return 1;
+    }
+
+    private static int buildRoadToPos(CommandContext<CommandSourceStack> context) {
+        try {
+            ServerPlayer player = context.getSource().getPlayerOrException();
+            ServerLevel level = context.getSource().getLevel();
+            int targetX = IntegerArgumentType.getInteger(context, "x");
+            int targetZ = IntegerArgumentType.getInteger(context, "z");
+
+            BlockPos start = player.blockPosition();
+            BlockPos end = new BlockPos(targetX, 0, targetZ);
+
+            RoadGenerator generator = RoadGenerator.getInstance();
+            generator.buildManualRoad(level, start, end);
+
+            context.getSource().sendSuccess(
+                    () -> Component.literal("Built road from " + start.toShortString() + " to " + end.toShortString()),
+                    true);
+
+            return 1;
+        } catch (Exception e) {
+            context.getSource().sendFailure(Component.literal("Error: " + e.getMessage()));
+            return 0;
+        }
+    }
+
+    private static int roadStatus(CommandContext<CommandSourceStack> context) {
+        RoadGenerator generator = RoadGenerator.getInstance();
+
+        String status = generator.isInitialized() ? "READY" : "INITIALIZING";
+        int structures = generator.getStructureCount();
+        int built = generator.getTotalRoadsBuilt();
+        int blocks = generator.getTotalBlocksPlaced();
+
+        context.getSource().sendSuccess(
+                () -> Component.literal("Road Generator Status: " + status),
+                false);
+        context.getSource().sendSuccess(
+                () -> Component.literal("  Structures found: " + structures),
+                false);
+        context.getSource().sendSuccess(
+                () -> Component.literal("  Roads built: " + built),
+                false);
+        context.getSource().sendSuccess(
+                () -> Component.literal("  Blocks placed: " + blocks),
+                false);
+
+        return 1;
+    }
+
+    private static int resetRoads(CommandContext<CommandSourceStack> context) {
+        RoadGenerator.getInstance().reset();
+        context.getSource().sendSuccess(
+                () -> Component.literal("Road generator reset. All data cleared."),
+                true);
+        return 1;
     }
 }

@@ -13,24 +13,27 @@ import java.util.EnumSet;
 
 /**
  * Dynamic aggro range goal that adjusts detection range based on level difference.
+ * Based on WoW Classic's ~20 yard base aggro (≈18 blocks).
  *
  * Formula:
- * - Base range: 16 blocks
- * - Add 1 block per level mob is ABOVE player (max +8 to reach 24)
- * - Subtract 1 block per level player is ABOVE mob (min 4 blocks)
+ * - Base range: 10 blocks (~11 yards)
+ * - Add 0.5 blocks per level mob is ABOVE player (max 18 blocks)
+ * - Subtract 0.5 blocks per level player is ABOVE mob (min 2 blocks)
  *
  * Examples:
- * - Player L10 vs Mob L10 → 16 blocks
- * - Player L10 vs Mob L15 → 21 blocks (higher level = more alert)
- * - Player L15 vs Mob L10 → 11 blocks (player outlevels = less threatening)
- * - Player L20 vs Mob L10 → 6 blocks (very safe in low zone)
- * - Player L5 vs Mob L20 → 24 blocks (max range, very dangerous)
+ * - Player L10 vs Mob L10 → 10 blocks (~11 yards)
+ * - Player L10 vs Mob L15 → 12.5 blocks (higher level = more alert)
+ * - Player L15 vs Mob L10 → 7.5 blocks (player outlevels = safer)
+ * - Player L20 vs Mob L10 → 5 blocks (very safe in low zone)
+ * - Player L25 vs Mob L10 → 2.5 blocks (practically ignore you)
+ * - Player L5 vs Mob L15 → 15 blocks (dangerous, high aggro)
+ * - Player L1 vs Mob L17+ → 18 blocks (max range, WoW Classic cap ~20 yards)
  */
 public class DynamicAggroRangeGoal extends NearestAttackableTargetGoal<Player> {
 
-    private static final int BASE_AGGRO_RANGE = 16;
-    private static final int MIN_AGGRO_RANGE = 4;
-    private static final int MAX_AGGRO_RANGE = 24;
+    private static final int BASE_AGGRO_RANGE = 10;
+    private static final int MIN_AGGRO_RANGE = 2;
+    private static final int MAX_AGGRO_RANGE = 18;
 
     private final Mob mob;
     private int mobLevel;
@@ -79,9 +82,9 @@ public class DynamicAggroRangeGoal extends NearestAttackableTargetGoal<Player> {
             playerLevel = data.level();
         }
 
-        // Calculate dynamic range
+        // Calculate dynamic range with gentler scaling (0.5 blocks per level)
         int levelDiff = mobLevel - playerLevel;
-        int aggroRange = BASE_AGGRO_RANGE + levelDiff;
+        double aggroRange = BASE_AGGRO_RANGE + (levelDiff * 0.5);
 
         // Clamp to min/max
         aggroRange = Math.max(MIN_AGGRO_RANGE, Math.min(MAX_AGGRO_RANGE, aggroRange));

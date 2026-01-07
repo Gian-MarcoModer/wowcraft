@@ -196,8 +196,10 @@ public class CombatStateManager {
      * Clear combat state for a player (on logout, death, etc.)
      */
     public static void clearState(Player player) {
-        lastCombatTime.remove(player.getUUID());
-        lastSpellCastTime.remove(player.getUUID());
+        UUID uuid = player.getUUID();
+        lastCombatTime.remove(uuid);
+        lastSpellCastTime.remove(uuid);
+        wasInCombat.remove(uuid);
     }
 
     /**

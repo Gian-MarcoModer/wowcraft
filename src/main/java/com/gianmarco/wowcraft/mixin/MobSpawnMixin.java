@@ -17,12 +17,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Mixin to suppress vanilla hostile mob spawning on the surface.
  * Pack mobs become the primary surface threat.
  * Caves and underground retain vanilla spawns.
+ * Passive mobs (animals) use vanilla spawning.
  */
 @Mixin(NaturalSpawner.class)
 public class MobSpawnMixin {
 
     /**
      * Cancels hostile mob spawns above Y=0 in the Overworld.
+     * Affects: MONSTER (zombies, skeletons, creepers, etc.)
+     * Allows: CREATURE (pigs, cows, chickens, etc.), underground cave spawns
      */
     @Inject(method = "isValidSpawnPostitionForType", at = @At("HEAD"), cancellable = true)
     private static void wowcraft$cancelSurfaceHostiles(

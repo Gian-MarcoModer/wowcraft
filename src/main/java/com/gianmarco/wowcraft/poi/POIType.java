@@ -6,11 +6,18 @@ package com.gianmarco.wowcraft.poi;
  */
 public enum POIType {
     /**
-     * Fixed camp location with 2-4 mob packs.
-     * Examples: Bandit camps, murloc villages, kobold mines.
-     * High density, mobs defend the area.
+     * Single camp - one spawn point with 3-5 mobs.
+     * Examples: Small bandit camp, murloc group, kobold patrol.
+     * Basic hostile mob encounter unit.
      */
     CAMP,
+
+    /**
+     * Multiple camps clustered together (2-4 camps).
+     * Examples: Bandit compound, murloc village, kobold mine.
+     * High density, rare special encounters.
+     */
+    COMPOUND,
 
     /**
      * Large roaming wildlife area with 1-2 wandering packs.
@@ -44,7 +51,7 @@ public enum POIType {
      * Check if this POI type spawns multiple packs.
      */
     public boolean isMultiPackType() {
-        return this == CAMP || this == RESOURCE_AREA;
+        return this == COMPOUND || this == RESOURCE_AREA;
     }
 
     /**

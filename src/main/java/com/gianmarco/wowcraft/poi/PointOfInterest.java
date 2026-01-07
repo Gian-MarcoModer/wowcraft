@@ -100,6 +100,7 @@ public abstract class PointOfInterest {
         // Delegate to specific POI type deserializers
         return switch (type) {
             case CAMP -> CampPOI.fromJson(json);
+            case COMPOUND -> CompoundPOI.fromJson(json);
             case WILDLIFE -> WildlifePOI.fromJson(json);
             case PATROL_ROUTE -> PatrolRoutePOI.fromJson(json);
             case RESOURCE_AREA -> ResourceAreaPOI.fromJson(json);

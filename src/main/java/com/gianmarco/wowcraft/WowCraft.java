@@ -90,23 +90,42 @@ public class WowCraft implements ModInitializer {
         // Register zone manager (tracks player zone transitions using lazy detection)
         com.gianmarco.wowcraft.zone.ZoneManager.register();
 
-        // ========== MOB PACK SYSTEM ==========
+        // ========== SPAWN SYSTEM ==========
 
-        // Initialize pack templates
+        // Initialize pack templates (still used for mob pack definitions)
         com.gianmarco.wowcraft.mobpack.MobPackTemplateLoader.init();
 
-        // Register chunk load event for pack spawning
+        // Register new spawn system (POI-based with lazy spawning)
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
             if (world instanceof net.minecraft.server.level.ServerLevel serverLevel) {
-                com.gianmarco.wowcraft.mobpack.MobPackManager.onChunkLoad(serverLevel, chunk.getPos());
+                // New spawn system (POI-based with lazy spawning)
+                com.gianmarco.wowcraft.spawn.SpawnSystemManager.onChunkLoad(serverLevel, chunk.getPos());
+
+                // Old pack spawning (disabled - new system handles all spawning)
+                // com.gianmarco.wowcraft.mobpack.MobPackManager.onChunkLoad(serverLevel, chunk.getPos());
             }
         });
 
-        // Register server tick for pack respawns
+        // Register server tick for spawn system
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK.register(level -> {
             if (level instanceof net.minecraft.server.level.ServerLevel serverLevel
                     && serverLevel.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+                // New spawn system tick (queued generation + lazy spawning)
+                com.gianmarco.wowcraft.spawn.SpawnSystemManager.onServerTick(serverLevel);
+
+                // Old pack respawns
                 com.gianmarco.wowcraft.mobpack.MobPackManager.onServerTick(serverLevel);
+            }
+        });
+
+        // Set world spawn to nearest village on server start
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents.LOAD.register((server, world) -> {
+            if (world.dimension() == net.minecraft.world.level.Level.OVERWORLD) {
+                // Run after a short delay to ensure world is fully loaded
+                server.execute(() -> {
+                    com.gianmarco.wowcraft.spawn.VillageSpawnHandler.setSpawnToVillage(
+                            (net.minecraft.server.level.ServerLevel) world);
+                });
             }
         });
 
