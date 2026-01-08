@@ -7,6 +7,7 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * Determines road block materials.
@@ -73,5 +74,13 @@ public class BiomeRoadMaterial {
      */
     public static boolean isRiverBiome(Holder<Biome> biomeHolder) {
         return biomeHolder.is(BiomeTags.IS_RIVER);
+    }
+
+    public static boolean isRoadSurface(BlockState state) {
+        return state.getBlock() == Blocks.DIRT_PATH;
+    }
+
+    public static boolean isRoadEdge(BlockState state) {
+        return state.getBlock() == Blocks.COARSE_DIRT;
     }
 }

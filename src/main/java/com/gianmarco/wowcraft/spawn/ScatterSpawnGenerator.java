@@ -55,7 +55,7 @@ public class ScatterSpawnGenerator {
             }
 
             // Check spacing from other scatter points
-            if (!isValidScatterLocation(surfacePos, scatterPoints)) {
+            if (!isValidScatterLocation(level, surfacePos, scatterPoints)) {
                 continue;
             }
 
@@ -123,8 +123,13 @@ public class ScatterSpawnGenerator {
      * Check if position is valid for scatter spawn.
      */
     private static boolean isValidScatterLocation(
+            ServerLevel level,
             BlockPos pos,
             List<SpawnPoint> existing) {
+
+        if (SafeZoneDetector.isOnRoad(level, pos)) {
+            return false;
+        }
 
         // Check distance from other scatter points
         int minDistSq = SCATTER_SPACING_MIN * SCATTER_SPACING_MIN;

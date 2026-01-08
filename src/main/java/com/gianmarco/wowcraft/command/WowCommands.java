@@ -306,11 +306,12 @@ public class WowCommands {
         try {
             ServerLevel level = context.getSource().getLevel();
             int roadsBefore = generator.getTotalRoadsBuilt();
-            generator.buildRoads(level);
+            generator.planAllRoads(level);
             int roadsBuilt = generator.getTotalRoadsBuilt() - roadsBefore;
 
             context.getSource().sendSuccess(
-                    () -> Component.literal("Built " + roadsBuilt + " roads instantly."),
+                    () -> Component.literal("Queued road plans. Built: " + roadsBuilt
+                            + ", active plans: " + generator.getActivePlanCount()),
                     true);
         } catch (Exception e) {
             context.getSource().sendFailure(Component.literal("Error: " + e.getMessage()));
@@ -351,6 +352,7 @@ public class WowCommands {
         int structures = generator.getStructureCount();
         int built = generator.getTotalRoadsBuilt();
         int blocks = generator.getTotalBlocksPlaced();
+        int active = generator.getActivePlanCount();
 
         context.getSource().sendSuccess(
                 () -> Component.literal("Road Generator Status: " + status),
@@ -363,6 +365,9 @@ public class WowCommands {
                 false);
         context.getSource().sendSuccess(
                 () -> Component.literal("  Blocks placed: " + blocks),
+                false);
+        context.getSource().sendSuccess(
+                () -> Component.literal("  Active plans: " + active),
                 false);
 
         return 1;

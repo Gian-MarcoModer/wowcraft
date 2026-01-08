@@ -98,6 +98,8 @@ public class WowCraft implements ModInitializer {
         // Register new spawn system (POI-based with lazy spawning)
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD.register((world, chunk) -> {
             if (world instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                com.gianmarco.wowcraft.roads.RoadGenerator.getInstance().onChunkLoad(serverLevel, chunk);
+
                 // New spawn system (POI-based with lazy spawning)
                 com.gianmarco.wowcraft.spawn.SpawnSystemManager.onChunkLoad(serverLevel, chunk.getPos());
 
@@ -138,6 +140,8 @@ public class WowCraft implements ModInitializer {
                         com.gianmarco.wowcraft.zone.ZoneSaveData.get(serverLevel);
                     saveData.save(true); // Include mob packs on shutdown
                     LOGGER.info("Saved zone data and mob packs on world unload");
+
+                    com.gianmarco.wowcraft.roads.RoadGenerator.getInstance().save(serverLevel);
                 }
 
                 com.gianmarco.wowcraft.zone.ZoneRegistry.clearZones();

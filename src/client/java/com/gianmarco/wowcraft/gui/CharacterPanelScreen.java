@@ -36,9 +36,15 @@ public class CharacterPanelScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        // Override to disable Minecraft's native blur effect
+        // Just draw a semi-transparent dark overlay
+        graphics.fill(0, 0, this.width, this.height, 0x88000000);
+    }
+
+    @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        // Dark overlay background
-        renderBackground(graphics, mouseX, mouseY, delta);
+        // renderBackground handles the overlay
 
         // Calculate panel position (centered)
         int x = (this.width - PANEL_WIDTH) / 2;

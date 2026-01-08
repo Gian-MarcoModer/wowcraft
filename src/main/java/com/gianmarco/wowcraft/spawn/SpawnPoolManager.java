@@ -262,6 +262,28 @@ public class SpawnPoolManager {
         }
     }
 
+    public static void applyRoadSafeZoneForChunk(ServerLevel level, ChunkPos chunk) {
+        List<SpawnPoint> points = getSpawnPointsNearChunk(chunk, 0);
+        for (SpawnPoint point : points) {
+            if (!SafeZoneDetector.canBeAffectedBySafeZone(point)) {
+                continue;
+            }
+
+            if (SafeZoneDetector.isOnRoad(level, point.getPosition())) {
+                suppressSpawnPoint(point, level);
+                continue;
+            }
+
+            if (SafeZoneDetector.isNearRoad(level, point.getPosition())) {
+                if (point.getHostility() == SpawnHostility.ALWAYS_HOSTILE) {
+                    point.setHostility(SpawnHostility.NEUTRAL_DEFENSIVE);
+                    List<MobOption> neutralMobs = MobOptionProvider.getNeutralMobs(point.getBiome());
+                    point.setMobOptions(neutralMobs);
+                }
+            }
+        }
+    }
+
     /**
      * Get squared distance to nearest player.
      */
@@ -383,6 +405,17 @@ public class SpawnPoolManager {
             }
         }
         point.clearSpawnedEntityIds();
+    }
+
+    private static void suppressSpawnPoint(SpawnPoint point, ServerLevel level) {
+        activeSpawnPoints.remove(point.getId());
+        point.setActiveInRotation(false);
+        point.setRespawnEnabled(false);
+        point.setState(SpawnPointState.INACTIVE);
+
+        if (point.hasSpawnedEntities()) {
+            unloadEntities(point, level);
+        }
     }
 
     /**

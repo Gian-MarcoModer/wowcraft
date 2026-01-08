@@ -10,6 +10,7 @@ import java.util.List;
  * Simple implementation for Phase 1.
  */
 public class SafeZoneDetector {
+    private static final int ROAD_SAFE_RADIUS = 6;
 
     /**
      * Check if a position is in a safe zone.
@@ -29,6 +30,44 @@ public class SafeZoneDetector {
         // TODO: Add player structure detection
         // TODO: Add light level checks
         // TODO: Add base age tracking
+
+        return false;
+    }
+
+    public static boolean isOnRoad(ServerLevel level, BlockPos pos) {
+        BlockPos ground = pos.below();
+        var groundState = level.getBlockState(ground);
+
+        if (com.gianmarco.wowcraft.roads.BiomeRoadMaterial.isRoadSurface(groundState)) {
+            return true;
+        }
+
+        if (com.gianmarco.wowcraft.roads.BiomeRoadMaterial.isRoadEdge(groundState)) {
+            return hasNearbyPathBlock(level, ground, 1);
+        }
+
+        if (groundState.getBlock() == net.minecraft.world.level.block.Blocks.OAK_PLANKS) {
+            return hasNearbyPathBlock(level, ground, 3);
+        }
+
+        return false;
+    }
+
+    public static boolean isNearRoad(ServerLevel level, BlockPos pos) {
+        return hasNearbyPathBlock(level, pos, ROAD_SAFE_RADIUS);
+    }
+
+    private static boolean hasNearbyPathBlock(ServerLevel level, BlockPos pos, int radius) {
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                cursor.set(pos.getX() + dx, pos.getY() - 1, pos.getZ() + dz);
+                if (com.gianmarco.wowcraft.roads.BiomeRoadMaterial.isRoadSurface(level.getBlockState(cursor))) {
+                    return true;
+                }
+            }
+        }
 
         return false;
     }
@@ -71,6 +110,15 @@ public class SafeZoneDetector {
     public static void applySafeZoneModifiers(SpawnPoint point, ServerLevel level) {
         if (!canBeAffectedBySafeZone(point)) {
             return;  // Can't be modified
+        }
+
+        if (isNearRoad(level, point.getPosition())) {
+            if (point.getHostility() == SpawnHostility.ALWAYS_HOSTILE) {
+                point.setHostility(SpawnHostility.NEUTRAL_DEFENSIVE);
+                List<MobOption> neutralMobs = MobOptionProvider.getNeutralMobs(point.getBiome());
+                point.setMobOptions(neutralMobs);
+            }
+            return;
         }
 
         if (!isInSafeZone(level, point.getPosition())) {

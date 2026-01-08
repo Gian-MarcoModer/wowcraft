@@ -15,9 +15,6 @@ import java.util.function.BooleanSupplier;
 @Mixin(ServerLevel.class)
 public class RoadTickMixin {
 
-    private int expansionTickCounter = 0;
-    private static final int EXPANSION_CHECK_FREQUENCY = 200; // Check every 10 seconds
-
     @Inject(method = "tick", at = @At("TAIL"))
     private void onTick(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         ServerLevel level = (ServerLevel) (Object) this;
@@ -28,13 +25,6 @@ public class RoadTickMixin {
 
             // Build roads
             generator.onServerTick(level);
-
-            // Periodically check for expansion as players explore
-            expansionTickCounter++;
-            if (expansionTickCounter >= EXPANSION_CHECK_FREQUENCY) {
-                expansionTickCounter = 0;
-                generator.checkExpansion(level);
-            }
         }
     }
 }
